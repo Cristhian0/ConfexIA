@@ -1,6 +1,6 @@
 .lotes-container {
   padding: 20px;
-  background-color: #f5f5f0; // Beige claro para tema textil
+  background-color: #f5f5f0;
 }
 
 .header-actions {
@@ -8,30 +8,68 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+
   h1 {
-    color: #2e7d32; // Verde para naturaleza/tela
+    color: #2e7d32;
   }
 }
 
 .action-buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+
   button {
-    background-color: #1976d2; // Azul para botones
+    background-color: #1976d2;
+
     &:hover {
       background-color: #1565c0;
     }
   }
 }
 
-table {
+.table-responsive {
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+}
+
+.lote-table {
+  min-width: 1200px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
   th {
-    background-color: #e3f2fd; // Azul muy claro
+    background-color: #e3f2fd;
     color: #0d47a1;
+    white-space: nowrap;
   }
+
   td {
     background-color: #fafafa;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .lotes-container {
+    padding: 12px;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .action-buttons {
+    width: 100%;
+
+    button {
+      flex: 1 1 100%;
+    }
   }
 }
 
