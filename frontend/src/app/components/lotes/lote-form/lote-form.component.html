@@ -108,11 +108,6 @@
 
     <mat-checkbox formControlName="es_pedido_especial">Pedido Especial</mat-checkbox>
 
-    <mat-form-field class="full-width">
-      <mat-label>Observaciones</mat-label>
-      <textarea matInput formControlName="observaciones" rows="3"></textarea>
-    </mat-form-field>
-
     <div class="detalles-section">
       <h3>Detalles por Color y Talla</h3>
       <p class="hint-text">Agregue las cantidades programadas por cada combinación de color y talla</p>
@@ -150,6 +145,11 @@
         Agregar Color/Talla
       </button>
     </div>
+
+    <mat-form-field class="full-width">
+      <mat-label>Observaciones</mat-label>
+      <textarea matInput formControlName="observaciones" rows="3"></textarea>
+    </mat-form-field>
 
     <div class="resumen-section" *ngIf="getTotalesPorTalla().length > 0">
       <h3>Resumen por Talla</h3>
