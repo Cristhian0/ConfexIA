@@ -1,19 +1,19 @@
 /* Angular Material Theme para empresa textil */
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import '@fontsource/material-icons/index.css';
 
 :root {
   --textile-bg: #ffffff;
   --textile-surface: #ffffff;
-  --textile-surface-soft: #f8f9fb;
-  --textile-primary: #003d82;
-  --textile-primary-dark: #002a5c;
-  --textile-accent: #2563eb;
-  --textile-accent-soft: #dbeafe;
+  --textile-surface-soft: #f5f3ff;
+  --textile-primary: #8b5cf6;
+  --textile-primary-dark: #6d28d9;
+  --textile-accent: #c084fc;
+  --textile-accent-soft: #f3e8ff;
   --textile-warn: #dc2626;
-  --textile-muted: #64748b;
-  --textile-border: rgba(0,61,130,0.08);
-  --textile-text: #1e293b;
+  --textile-muted: #6b7280;
+  --textile-border: rgba(139,92,246,0.16);
+  --textile-text: #1f2937;
 }
 
 * {
@@ -71,7 +71,7 @@ body::before {
 }
 
 .mat-mdc-button.mat-mdc-button-filled {
-  background-color: var(--textile-accent) !important;
+  background-color: var(--textile-primary) !important;
   color: #ffffff !important;
 }
 
@@ -81,7 +81,7 @@ body::before {
 }
 
 .mat-mdc-button.mat-mdc-button-filled:hover {
-  background-color: #b77834 !important;
+  background-color: var(--textile-primary-dark) !important;
 }
 
 .mat-mdc-form-field {

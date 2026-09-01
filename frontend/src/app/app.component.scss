@@ -1,7 +1,7 @@
-$sidebar-bg: #003d82;
-$sidebar-active: rgba(255, 255, 255, 0.15);
+$sidebar-bg: #7c3aed;
+$sidebar-active: rgba(255, 255, 255, 0.18);
 $sidebar-text: #ffffff;
-$topbar-bg: #003d82;
+$topbar-bg: #8b5cf6;
 $topbar-text: #ffffff;
 $panel-bg: #ffffff;
 
@@ -72,12 +72,13 @@ $panel-bg: #ffffff;
 
   a.mat-mdc-list-item:hover,
   button.mat-mdc-list-item:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.12);
     transform: translateX(2px);
   }
 
   a.active {
     background-color: $sidebar-active !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
   }
 
   .sidebar-logout-btn {
@@ -197,7 +198,7 @@ $panel-bg: #ffffff;
 }
 
 .page-breadcrumbs a {
-  color: #1976d2;
+  color: #8b5cf6;
   text-decoration: none;
 }
 
@@ -220,7 +221,7 @@ button.mat-icon-button.action-button mat-icon[color="warn"] {
 }
 
 button.mat-icon-button.action-button mat-icon[color="primary"] {
-  color: #1976d2;
+  color: #7c3aed;
 }
 
 .mat-mdc-card {
@@ -230,7 +231,7 @@ button.mat-icon-button.action-button mat-icon[color="primary"] {
 /* Landing hero for unauthenticated users */
 .landing-hero {
   padding: 48px 24px;
-  background: linear-gradient(180deg, #0f3a66 0%, #0b2a4a 100%);
+  background: linear-gradient(180deg, #4c1d95 0%, #312e81 100%);
   color: #ffffff;
 }
 
