@@ -1,0 +1,392 @@
+.colillas-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header-card {
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  mat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  mat-card-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  mat-card-subtitle {
+    color: #666;
+    margin: 0;
+  }
+}
+
+.filtros-card {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-left: 4px solid #4472c4;
+
+  .filtros-form {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+
+    mat-form-field {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    button {
+      height: 56px;
+    }
+  }
+}
+
+.main-tabs {
+  margin-bottom: 20px;
+}
+
+.modern-tabs ::ng-deep .mat-mdc-tab-header {
+  background: linear-gradient(135deg, #e0ecff 0%, #f8fbff 100%);
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  border-radius: 18px;
+  padding: 4px;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.10);
+}
+
+.modern-tabs ::ng-deep .mat-mdc-tab {
+  min-height: 48px;
+  border-radius: 14px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.modern-tabs ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+  color: #334155;
+}
+
+.modern-tabs ::ng-deep .mat-mdc-tab.mdc-tab--active {
+  background: linear-gradient(135deg, #003d82 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 61, 130, 0.24);
+}
+
+.modern-tabs ::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: #ffffff;
+}
+
+.modern-tabs ::ng-deep .mat-tab-body {
+  padding: 20px 0;
+}
+
+// CREAR CARD
+.create-card {
+  margin-bottom: 20px;
+
+  form {
+    h3 {
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #4472c4;
+      padding-bottom: 10px;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-top: 30px;
+
+  button {
+    min-width: 150px;
+  }
+}
+
+// LIST CARD
+.list-card {
+  margin-bottom: 20px;
+
+  mat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+
+      button {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+
+// LOADING SPINNER
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+
+  mat-spinner {
+    margin-bottom: 20px;
+  }
+
+  p {
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+// NO DATA
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #999;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #ddd;
+    margin-bottom: 15px;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+// TABLA
+.table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.colillas-table {
+  width: 100%;
+  background: white;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 14px;
+
+  th {
+    background: linear-gradient(135deg, #003d82 0%, #2563eb 100%);
+    font-weight: 700;
+    color: #ffffff;
+    border-bottom: none;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(37, 99, 235, 0.10);
+  }
+
+  tr:nth-child(even) {
+    background: #f8fbff;
+  }
+
+  tr:hover {
+    background-color: #edf4ff;
+  }
+
+  .actions-cell {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+  }
+
+  mat-progress-bar {
+    margin-top: 5px;
+    height: 4px;
+  }
+}
+
+// CONFECCIONISTAS LIST
+.confeccionistas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .confeccionista-panel {
+    margin-bottom: 10px;
+    background: white;
+    border-left: 4px solid #4472c4;
+
+    ::ng-deep .mat-expansion-panel-header {
+      padding: 0 20px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+
+      strong {
+        font-size: 16px;
+        min-width: 200px;
+      }
+
+      mat-chip-list {
+        margin-left: 20px;
+        flex: 1;
+      }
+    }
+  }
+
+  mat-list {
+    background: #fafafa;
+
+    .colilla-item {
+      border-bottom: 1px solid #eee;
+      padding: 12px 0 !important;
+
+      .mat-list-item-content {
+        padding: 0 16px;
+
+        button {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+}
+
+// FILE UPLOAD
+.import-card {
+  margin-bottom: 20px;
+}
+
+.file-upload-area {
+  border: 2px dashed #4472c4;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  background: #f9f9f9;
+  margin: 30px 0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #f0f0f0;
+    border-color: #2e5c8a;
+  }
+
+  .upload-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #4472c4;
+    margin-bottom: 15px;
+  }
+
+  .upload-text {
+    font-size: 16px;
+    color: #666;
+    margin: 15px 0;
+  }
+
+  button {
+    margin-top: 15px;
+  }
+}
+
+.info-text {
+  margin-top: 15px;
+  padding: 10px;
+  background: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  color: #1565c0;
+  border-radius: 4px;
+}
+
+// RESPONSIVE
+@media (max-width: 768px) {
+  .filtros-card {
+    .filtros-form {
+      flex-direction: column;
+
+      mat-form-field,
+      button {
+        width: 100%;
+        margin-right: 0;
+      }
+    }
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .colillas-table {
+    font-size: 12px;
+
+    td,
+    th {
+      padding: 8px;
+    }
+  }
+
+  .confeccionistas-list {
+    .panel-title {
+      flex-direction: column;
+      align-items: flex-start;
+
+      mat-chip-list {
+        margin-left: 0;
+        margin-top: 10px;
+      }
+    }
+  }
+}
+
+// MATERIAL OVERRIDES
+::ng-deep {
+  .mat-form-field-outline {
+    top: 1.0625em;
+  }
+
+  .mat-expansion-panel {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+
+    &:hover {
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    }
+  }
+}

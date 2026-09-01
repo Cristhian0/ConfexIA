@@ -1,0 +1,156 @@
+<div class="financiero-container">
+  <h1>Módulos 8-9: Costos & Reportes (RF-23 a RF-27)</h1>
+
+  <div *ngIf="error" class="mensaje error">{{ error }}</div>
+
+  <div *ngIf="loading && !indicadores" class="loading">
+    <mat-spinner></mat-spinner>
+    <p>Cargando datos financieros...</p>
+  </div>
+
+  <!-- Sección: Indicadores Clave (RF-27) -->
+  <div class="section" *ngIf="indicadores">
+    <h2><mat-icon>trending_up</mat-icon> Indicadores Clave (RF-27)</h2>
+    <div class="indicadores-grid">
+      <mat-card class="indicador-card">
+        <mat-card-header>
+          <mat-card-title>% Desperdicio Tela</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="indicador-valor" [class.alerta]="indicadores.desperdicio_tela_pct > 5">
+            {{ indicadores.desperdicio_tela_pct.toFixed(2) }}%
+          </div>
+          <p class="indicador-desc">Porcentaje de tela descartada en corte</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="indicador-card">
+        <mat-card-header>
+          <mat-card-title>% Defectos</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="indicador-valor" [class.alerta]="indicadores.defectos_pct > 3">
+            {{ indicadores.defectos_pct.toFixed(2) }}%
+          </div>
+          <p class="indicador-desc">Porcentaje de prendas con defectos</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="indicador-card">
+        <mat-card-header>
+          <mat-card-title>Costo Unitario Promedio</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="indicador-valor">
+            ${{ indicadores.costo_unitario_promedio.toFixed(2) }}
+          </div>
+          <p class="indicador-desc">Costo promedio por prenda (RF-23)</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Sección: Producción por Día / Línea (RF-26) -->
+  <div class="section" *ngIf="produccionDiaLinea.length > 0">
+    <h2><mat-icon>calendar_today</mat-icon> Producción por Día / Línea (RF-26)</h2>
+    <mat-card>
+      <mat-card-content>
+        <table mat-table [dataSource]="produccionDiaLinea" class="mat-elevation-z2">
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <td mat-cell *matCellDef="let item">{{ item.fecha }}</td>
+          </ng-container>
+          <ng-container matColumnDef="linea_produccion">
+            <th mat-header-cell *matHeaderCellDef>Línea</th>
+            <td mat-cell *matCellDef="let item">{{ item.linea_produccion || 'Sin asignar' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="cantidad_producida">
+            <th mat-header-cell *matHeaderCellDef>Piezas Producidas</th>
+            <td mat-cell *matCellDef="let item">{{ item.cantidad_producida }}</td>
+          </ng-container>
+          <ng-container matColumnDef="cantidad_rechazada">
+            <th mat-header-cell *matHeaderCellDef>Piezas Rechazadas</th>
+            <td mat-cell *matCellDef="let item" [class.rechazadas]="item.cantidad_rechazada > 0">
+              {{ item.cantidad_rechazada }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="eficiencia_hph">
+            <th mat-header-cell *matHeaderCellDef>Eficiencia (pz/hora)</th>
+            <td mat-cell *matCellDef="let item" [class.eficiente]="item.eficiencia_hph > 10">
+              {{ item.eficiencia_hph.toFixed(2) }}
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['fecha', 'linea_produccion', 'cantidad_producida', 'cantidad_rechazada', 'eficiencia_hph']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['fecha', 'linea_produccion', 'cantidad_producida', 'cantidad_rechazada', 'eficiencia_hph'];"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Sección: Eficiencia por Operario (RF-27) -->
+  <div class="section" *ngIf="indicadores && indicadores.eficiencia_operarios.length > 0">
+    <h2><mat-icon>person</mat-icon> Eficiencia por Operario (RF-27)</h2>
+    <mat-card>
+      <mat-card-content>
+        <table mat-table [dataSource]="indicadores.eficiencia_operarios" class="mat-elevation-z2">
+          <ng-container matColumnDef="operario">
+            <th mat-header-cell *matHeaderCellDef>Operario</th>
+            <td mat-cell *matCellDef="let item">{{ item.operario }}</td>
+          </ng-container>
+          <ng-container matColumnDef="produccion_total">
+            <th mat-header-cell *matHeaderCellDef>Producción Total</th>
+            <td mat-cell *matCellDef="let item">{{ item.produccion_total }}</td>
+          </ng-container>
+          <ng-container matColumnDef="horas_trabajadas">
+            <th mat-header-cell *matHeaderCellDef>Horas</th>
+            <td mat-cell *matCellDef="let item">{{ item.horas_trabajadas }}</td>
+          </ng-container>
+          <ng-container matColumnDef="piezas_por_hora">
+            <th mat-header-cell *matHeaderCellDef>Piezas/Hora</th>
+            <td mat-cell *matCellDef="let item" [class.eficiente]="item.piezas_por_hora > 10">
+              {{ item.piezas_por_hora.toFixed(2) }}
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['operario', 'produccion_total', 'horas_trabajadas', 'piezas_por_hora']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['operario', 'produccion_total', 'horas_trabajadas', 'piezas_por_hora'];"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Información de RF-23, RF-24, RF-25 -->
+  <div class="section info-section">
+    <h2><mat-icon>info</mat-icon> Funcionalidades de Módulos 8-9</h2>
+    <mat-card>
+      <mat-card-content>
+        <div class="feature">
+          <h3>RF-23: Calcular costo por prenda</h3>
+          <p>Desglose de costos por:</p>
+          <ul>
+            <li><strong>Tela:</strong> Costo material de tela utilizada</li>
+            <li><strong>Mano de obra:</strong> Salarios y costos operativos</li>
+            <li><strong>Insumos:</strong> Hilos, botones, etc.</li>
+          </ul>
+          <p><em>Los costos se registran en el módulo de documentos (NOC) y se clasifican automáticamente.</em></p>
+        </div>
+
+        <mat-divider class="feature-divider"></mat-divider>
+
+        <div class="feature">
+          <h3>RF-24: Registrar anticipos</h3>
+          <p>Los anticipos se registran en el sistema de Documentos como movimientos financieros tipo "anticipo".</p>
+          <p>Se pueden consultar en el detalle de cada NOC y se usan para calcular rentabilidad.</p>
+        </div>
+
+        <mat-divider class="feature-divider"></mat-divider>
+
+        <div class="feature">
+          <h3>RF-25: Rentabilidad por lote</h3>
+          <p><strong>Fórmula:</strong> Rentabilidad = Anticipo Total - Costo Total</p>
+          <p><strong>% Rentabilidad:</strong> (Rentabilidad / Anticipo Total) × 100</p>
+          <p><em>Los datos se calculan en tiempo real desde los registros de documentos (NOC).</em></p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

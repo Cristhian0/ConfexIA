@@ -1,0 +1,517 @@
+<div class="calidad-container">
+  <h1>Control de Calidad - Inspecciones (RF-15 a RF-18)</h1>
+
+  <!-- Mensajes -->
+  <div *ngIf="exitoMensaje" class="mensaje exito">
+    {{ exitoMensaje }}
+  </div>
+  <div *ngIf="errorMensaje" class="mensaje error">
+    {{ errorMensaje }}
+  </div>
+
+  <!-- Sección de Inspecciones -->
+  <div *ngIf="!selectedInspeccion" class="seccion-inspecciones">
+    <div class="encabezado">
+      <h2>Inspecciones de Calidad</h2>
+      <button class="btn btn-primary" (click)="mostrarFormulario = !mostrarFormulario">
+        {{ mostrarFormulario ? 'Cancelar' : 'Nueva Inspección (RF-15)' }}
+      </button>
+    </div>
+
+    <!-- Formulario de nueva inspección -->
+    <form *ngIf="mostrarFormulario" [formGroup]="formularioInspeccion" class="formulario">
+      <h3>Crear Nueva Inspección</h3>
+      
+      <div class="fila">
+        <div class="campo">
+          <label>Orden de Producción *</label>
+          <select formControlName="orden_produccion_id" class="input">
+            <option value="">Seleccionar orden</option>
+            <option *ngFor="let orden of ordenesProduccion" [value]="orden.id">
+              {{ orden.numero_orden }}
+            </option>
+          </select>
+        </div>
+        <div class="campo">
+          <label>Inspector *</label>
+          <input 
+            type="text" 
+            formControlName="inspector" 
+            class="input" 
+            placeholder="Nombre del inspector"
+          />
+        </div>
+      </div>
+
+      <div class="fila">
+        <div class="campo">
+          <label>Cantidad Inspeccionada *</label>
+          <input 
+            type="number" 
+            formControlName="cantidad_inspeccionada" 
+            class="input" 
+            min="1"
+          />
+        </div>
+      </div>
+
+      <div class="fila">
+        <div class="campo">
+          <label>Cantidad OK *</label>
+          <input 
+            type="number" 
+            formControlName="cantidad_ok" 
+            class="input" 
+            min="0"
+          />
+        </div>
+        <div class="campo">
+          <label>Cantidad Reproceso *</label>
+          <input 
+            type="number" 
+            formControlName="cantidad_reproceso" 
+            class="input" 
+            min="0"
+          />
+        </div>
+        <div class="campo">
+          <label>Cantidad Defectuosa *</label>
+          <input 
+            type="number" 
+            formControlName="cantidad_defectuosa" 
+            class="input" 
+            min="0"
+          />
+        </div>
+      </div>
+
+      <div class="fila">
+        <div class="campo">
+          <label>Clasificación *</label>
+          <select formControlName="clasificacion" class="input">
+            <option *ngFor="let clase of clasificaciones" [value]="clase">
+              {{ getClasificacionLabel(clase) }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fila">
+        <div class="campo">
+          <label>Observaciones</label>
+          <textarea formControlName="observaciones" class="input textarea"></textarea>
+        </div>
+      </div>
+
+      <div class="fila">
+        <div class="campo checkbox">
+          <input 
+            type="checkbox" 
+            formControlName="reingresar_produccion" 
+            id="reingresar"
+          />
+          <label for="reingresar">Reingresar a Producción (RF-18)</label>
+        </div>
+      </div>
+
+      <div class="acciones">
+        <button 
+          type="button" 
+          class="btn btn-success" 
+          (click)="crearInspeccion()"
+          [disabled]="cargando || formularioInspeccion.invalid"
+        >
+          {{ cargando ? 'Creando...' : 'Crear Inspección' }}
+        </button>
+      </div>
+    </form>
+
+    <!-- Filtros -->
+    <div class="filtros">
+      <h3>Filtros</h3>
+      <div class="fila">
+        <div class="campo">
+          <label>Orden ID</label>
+          <input 
+            type="number" 
+            [(ngModel)]="filtroOrdenId" 
+            class="input"
+            placeholder="ID orden"
+          />
+        </div>
+        <div class="campo">
+          <label>Clasificación</label>
+          <select [(ngModel)]="filtroClasificacion" class="input">
+            <option value="">Todas</option>
+            <option *ngFor="let clase of clasificaciones" [value]="clase">
+              {{ getClasificacionLabel(clase) }}
+            </option>
+          </select>
+        </div>
+        <div class="campo">
+          <label>Inspector</label>
+          <input 
+            type="text" 
+            [(ngModel)]="filtroInspector" 
+            class="input"
+            placeholder="Nombre inspector"
+          />
+        </div>
+        <div class="campo acciones-filtro">
+          <button class="btn btn-sm btn-primary" (click)="aplicarFiltros()">
+            Aplicar Filtros
+          </button>
+          <button class="btn btn-sm btn-secondary" (click)="limpiarFiltros()">
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de inspecciones -->
+    <div class="tabla-container">
+      <h3>Lista de Inspecciones</h3>
+      <div *ngIf="cargando" class="cargando">Cargando...</div>
+      <table *ngIf="!cargando && inspecciones.length > 0" class="tabla">
+        <thead>
+          <tr>
+            <th>Nº Inspección</th>
+            <th>Orden</th>
+            <th>Inspector</th>
+            <th>Clasificación</th>
+            <th>Cant. OK</th>
+            <th>Cant. Reproceso</th>
+            <th>Cant. Defectuosa</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let inspeccion of inspecciones">
+            <td class="numero">{{ inspeccion.numero_inspeccion }}</td>
+            <td>{{ inspeccion.orden_produccion_id }}</td>
+            <td>{{ inspeccion.inspector }}</td>
+            <td>
+              <span [ngClass]="'clasificacion ' + getClasificacionClase(inspeccion.clasificacion)">
+                {{ getClasificacionLabel(inspeccion.clasificacion) }}
+              </span>
+            </td>
+            <td class="numero">{{ inspeccion.cantidad_ok }}</td>
+            <td class="numero">{{ inspeccion.cantidad_reproceso }}</td>
+            <td class="numero">{{ inspeccion.cantidad_defectuosa }}</td>
+            <td>{{ inspeccion.fecha_inspeccion | date: 'dd/MM/yyyy' }}</td>
+            <td class="acciones-col">
+              <button class="btn btn-sm btn-info" (click)="cargarDetalle(inspeccion.id)">
+                Ver Detalles
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!cargando && inspecciones.length === 0" class="sin-datos">
+        No hay inspecciones para mostrar
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de Detalles -->
+  <div *ngIf="selectedInspeccion" class="seccion-detalles">
+    <div class="encabezado">
+      <button class="btn btn-secondary" (click)="volver()">← Volver</button>
+      <h2>Inspección: {{ selectedInspeccion.numero_inspeccion }}</h2>
+    </div>
+
+    <!-- Información General -->
+    <div class="card">
+      <h3>Información General</h3>
+      <div class="fila">
+        <div class="dato">
+          <label>Nº Inspección:</label>
+          <span>{{ selectedInspeccion.numero_inspeccion }}</span>
+        </div>
+        <div class="dato">
+          <label>Orden:</label>
+          <span>{{ selectedInspeccion.orden_produccion_id }}</span>
+        </div>
+        <div class="dato">
+          <label>Inspector:</label>
+          <span>{{ selectedInspeccion.inspector }}</span>
+        </div>
+        <div class="dato">
+          <label>Fecha:</label>
+          <span>{{ selectedInspeccion.fecha_inspeccion | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Datos de Calidad</h3>
+      <form [formGroup]="formularioCalidad" class="formulario calidad-form">
+        <div class="calidad-grid">
+          <div class="campo calidad-field">
+            <label>Fecha recepción</label>
+            <input type="date" formControlName="fecha_recepcion" class="input" />
+          </div>
+
+          <div class="campo calidad-field">
+            <label>Revisa</label>
+            <input type="text" formControlName="revisado_por" class="input" placeholder="Persona responsable" />
+          </div>
+
+          <div class="campo calidad-field">
+            <label>Parcial</label>
+            <input type="number" min="0" formControlName="cantidad_parcial" class="input" />
+          </div>
+
+          <div class="campo calidad-field">
+            <label>Arreglos</label>
+            <input type="number" min="0" formControlName="cantidad_arreglos" class="input" />
+          </div>
+
+          <div class="campo calidad-field">
+            <label>Imperfecta</label>
+            <input type="number" min="0" formControlName="cantidad_imperfecciones" class="input" />
+          </div>
+
+          <div class="campo calidad-field">
+            <label>Pendientes</label>
+            <input type="number" min="0" formControlName="cantidad_pendiente" class="input" />
+          </div>
+
+          <div class="campo calidad-field checkbox-field">
+            <label>Compras</label>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" formControlName="requiere_compras" />
+              <span>Requiere compras</span>
+            </div>
+          </div>
+
+          <div class="campo calidad-field">
+            <label>Entrega total</label>
+            <input type="date" formControlName="fecha_entrega_total" class="input" />
+          </div>
+
+          <div class="campo calidad-field">
+            <label>Días de Mora</label>
+            <input type="number" min="0" formControlName="dias_mora" class="input" />
+          </div>
+
+          <div class="campo calidad-field estado-field">
+            <label>Estado de pago</label>
+            <select formControlName="estado_pago" class="input">
+              <option value="">Selecciona estado</option>
+              <option *ngFor="let estado of estadosPago" [value]="estado">{{ estado }}</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Clasificación (RF-16) -->
+    <div class="card">
+      <h3>Clasificación (RF-16)</h3>
+      <div class="fila">
+        <div class="dato">
+          <label>Clasificación Actual:</label>
+          <span [ngClass]="'clasificacion ' + getClasificacionClase(selectedInspeccion.clasificacion)">
+            {{ getClasificacionLabel(selectedInspeccion.clasificacion) }}
+          </span>
+        </div>
+      </div>
+      <div class="fila acciones">
+        <button 
+          *ngFor="let clase of clasificaciones"
+          class="btn btn-sm"
+          [ngClass]="selectedInspeccion.clasificacion === clase ? 'btn-primary' : 'btn-secondary'"
+          (click)="actualizarClasificacion(clase)"
+          [disabled]="cargando"
+        >
+          {{ getClasificacionLabel(clase) }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Resultados Inspección -->
+    <div class="card">
+      <h3>Resultados de la Inspección</h3>
+      <div class="fila">
+        <div class="dato">
+          <label>Cantidad Inspeccionada:</label>
+          <span>{{ selectedInspeccion.cantidad_inspeccionada }}</span>
+        </div>
+        <div class="dato">
+          <label>OK:</label>
+          <span class="ok">{{ selectedInspeccion.cantidad_ok }}</span>
+        </div>
+        <div class="dato">
+          <label>Reproceso:</label>
+          <span class="reproceso">{{ selectedInspeccion.cantidad_reproceso }}</span>
+        </div>
+        <div class="dato">
+          <label>Defectuosa:</label>
+          <span class="defectuosa">{{ selectedInspeccion.cantidad_defectuosa }}</span>
+        </div>
+      </div>
+
+      <!-- Porcentajes -->
+      <div *ngIf="porcentajes" class="porcentajes">
+        <h4>Porcentajes</h4>
+        <div class="barra-progreso">
+          <div class="barra">
+            <div 
+              class="segmento ok" 
+              [style.width.%]="porcentajes.porcentaje_ok"
+              [title]="porcentajes.porcentaje_ok + '%'"
+            ></div>
+            <div 
+              class="segmento reproceso" 
+              [style.width.%]="porcentajes.porcentaje_reproceso"
+              [title]="porcentajes.porcentaje_reproceso + '%'"
+            ></div>
+            <div 
+              class="segmento defectuosa" 
+              [style.width.%]="porcentajes.porcentaje_defectuosa"
+              [title]="porcentajes.porcentaje_defectuosa + '%'"
+            ></div>
+          </div>
+        </div>
+        <div class="leyenda">
+          <span class="leyenda-item ok">OK: {{ porcentajes.porcentaje_ok }}%</span>
+          <span class="leyenda-item reproceso">Reproceso: {{ porcentajes.porcentaje_reproceso }}%</span>
+          <span class="leyenda-item defectuosa">Defectuosa: {{ porcentajes.porcentaje_defectuosa }}%</span>
+        </div>
+      </div>
+
+      <div *ngIf="selectedInspeccion.observaciones" class="observaciones">
+        <label>Observaciones:</label>
+        <p>{{ selectedInspeccion.observaciones }}</p>
+      </div>
+    </div>
+
+    <!-- Defectos (RF-17) -->
+    <div class="card">
+      <h3>Defectos Identificados (RF-17)</h3>
+      
+      <div class="acciones-defecto">
+        <button 
+          class="btn btn-primary btn-sm" 
+          (click)="mostrarFormularioDefecto = !mostrarFormularioDefecto"
+        >
+          {{ mostrarFormularioDefecto ? 'Cancelar' : 'Agregar Defecto' }}
+        </button>
+      </div>
+
+      <!-- Formulario agregar defecto -->
+      <form *ngIf="mostrarFormularioDefecto" [formGroup]="formularioDefecto" class="formulario-defecto">
+        <div class="fila">
+          <div class="campo">
+            <label>Tipo de Defecto *</label>
+            <select formControlName="tipo_defecto" class="input">
+              <option *ngFor="let tipo of tiposDefecto" [value]="tipo">
+                {{ getTipoDefectoLabel(tipo) }}
+              </option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Cantidad de Defectos *</label>
+            <input 
+              type="number" 
+              formControlName="cantidad_defectos" 
+              class="input" 
+              min="1"
+            />
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <label>Descripción</label>
+            <textarea formControlName="descripcion" class="input textarea"></textarea>
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <label>Recomendación</label>
+            <textarea formControlName="recomendacion" class="input textarea"></textarea>
+          </div>
+        </div>
+
+        <div class="acciones">
+          <button 
+            type="button" 
+            class="btn btn-success btn-sm" 
+            (click)="agregarDefecto()"
+            [disabled]="cargando || formularioDefecto.invalid"
+          >
+            {{ cargando ? 'Agregando...' : 'Agregar Defecto' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Tabla de defectos -->
+      <div class="tabla-container" *ngIf="selectedDefectos.length > 0">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Cantidad</th>
+              <th>Descripción</th>
+              <th>Recomendación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let defecto of selectedDefectos">
+              <td>{{ getTipoDefectoLabel(defecto.tipo_defecto) }}</td>
+              <td class="numero">{{ defecto.cantidad_defectos }}</td>
+              <td>{{ defecto.descripcion || '-' }}</td>
+              <td>{{ defecto.recomendacion || '-' }}</td>
+              <td class="acciones-col">
+                <button 
+                  class="btn btn-sm btn-danger" 
+                  (click)="eliminarDefecto(defecto.id)"
+                  [disabled]="cargando"
+                >
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="selectedDefectos.length === 0 && !mostrarFormularioDefecto" class="sin-datos">
+        No hay defectos registrados
+      </div>
+    </div>
+
+    <!-- Reingresar a Producción (RF-18) -->
+    <div class="card">
+      <h3>Reingresar a Producción (RF-18)</h3>
+      <div class="fila">
+        <div class="dato">
+          <label>Reingresar:</label>
+          <span [ngClass]="selectedInspeccion.reingresar_produccion ? 'si' : 'no'">
+            {{ selectedInspeccion.reingresar_produccion ? 'Sí' : 'No' }}
+          </span>
+        </div>
+      </div>
+
+      <div *ngIf="puedeReingresar" class="info-reingresar">
+        <p><strong>✓ Esta prenda puede reingresar a producción</strong></p>
+        <p>Hay defectos que pueden ser reparados.</p>
+        <button 
+          class="btn btn-warning" 
+          (click)="marcarReingresar()"
+          [disabled]="selectedInspeccion.reingresar_produccion || cargando"
+        >
+          {{ cargando ? 'Procesando...' : 'Marcar para Reingresar' }}
+        </button>
+      </div>
+      <div *ngIf="!puedeReingresar" class="info-no-reingresar">
+        <p><strong>✗ Esta prenda no puede reingresar a producción</strong></p>
+        <p>Todos los resultados son OK o la prenda está completamente defectuosa.</p>
+      </div>
+    </div>
+  </div>
+</div>

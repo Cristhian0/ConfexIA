@@ -1,0 +1,68 @@
+<div class="dialog-header">
+  <mat-icon class="dialog-icon">{{ isEdit ? 'edit' : 'style' }}</mat-icon>
+  <h2 mat-dialog-title>{{ isEdit ? 'Editar Referencia' : 'Nueva Referencia' }}</h2>
+</div>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="referenciaForm" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Código</mat-label>
+        <input matInput formControlName="codigo" placeholder="Ej: TSH001, PNT002" required>
+        <mat-icon matPrefix>tag</mat-icon>
+        <mat-error *ngIf="referenciaForm.get('codigo')?.hasError('required')">
+          El código es requerido
+        </mat-error>
+        <mat-error *ngIf="referenciaForm.get('codigo')?.hasError('maxlength')">
+          El código no puede tener más de 20 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" placeholder="Ej: Camiseta Básica, Pantalón Cargo" required>
+        <mat-icon matPrefix>label</mat-icon>
+        <mat-error *ngIf="referenciaForm.get('nombre')?.hasError('required')">
+          El nombre es requerido
+        </mat-error>
+        <mat-error *ngIf="referenciaForm.get('nombre')?.hasError('maxlength')">
+          El nombre no puede tener más de 200 caracteres
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field full-width">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="descripcion" rows="3" placeholder="Descripción detallada de la referencia"></textarea>
+        <mat-icon matPrefix>description</mat-icon>
+        <mat-error *ngIf="referenciaForm.get('descripcion')?.hasError('maxlength')">
+          La descripción no puede tener más de 500 caracteres
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row checkbox-row">
+      <mat-checkbox formControlName="es_pedido_especial" class="special-checkbox">
+        <mat-icon>star</mat-icon>
+        <span>Es pedido especial</span>
+      </mat-checkbox>
+
+      <mat-checkbox formControlName="activo" class="status-checkbox">
+        <mat-icon>check_circle</mat-icon>
+        <span>Activo</span>
+      </mat-checkbox>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="onCancel()" class="cancel-button">
+    <mat-icon>close</mat-icon>
+    Cancelar
+  </button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!referenciaForm.valid" class="submit-button">
+    <mat-icon>{{ isEdit ? 'save' : 'add' }}</mat-icon>
+    {{ isEdit ? 'Actualizar' : 'Crear' }}
+  </button>
+</mat-dialog-actions>

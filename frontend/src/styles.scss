@@ -1,0 +1,139 @@
+/* Angular Material Theme para empresa textil */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import '@fontsource/material-icons/index.css';
+
+:root {
+  --textile-bg: #ffffff;
+  --textile-surface: #ffffff;
+  --textile-surface-soft: #f8f9fb;
+  --textile-primary: #003d82;
+  --textile-primary-dark: #002a5c;
+  --textile-accent: #2563eb;
+  --textile-accent-soft: #dbeafe;
+  --textile-warn: #dc2626;
+  --textile-muted: #64748b;
+  --textile-border: rgba(0,61,130,0.08);
+  --textile-text: #1e293b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: var(--textile-text);
+  background: #ffffff;
+}
+
+.material-icons {
+  font-family: 'Material Icons' !important;
+  font-feature-settings: 'liga' 1;
+  font-variation-settings: 'wght' 400;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: transparent;
+  z-index: -1;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
+  z-index: 0;
+}
+
+.mat-mdc-card {
+  background: rgba(255, 255, 250, 0.96);
+  border: 1px solid var(--textile-border);
+  box-shadow: 0 20px 40px rgba(45, 57, 66, 0.08);
+  border-radius: 20px;
+}
+
+.mat-mdc-toolbar, .mat-mdc-top-app-bar {
+  background: var(--textile-primary) !important;
+  color: #ffffff !important;
+}
+
+.mat-mdc-button.mat-mdc-button-filled {
+  background-color: var(--textile-accent) !important;
+  color: #ffffff !important;
+}
+
+.mat-mdc-button.mat-mdc-button-outlined {
+  border-color: var(--textile-primary) !important;
+  color: var(--textile-primary) !important;
+}
+
+.mat-mdc-button.mat-mdc-button-filled:hover {
+  background-color: #b77834 !important;
+}
+
+.mat-mdc-form-field {
+  background: rgba(255,255,255,0.92);
+  border-radius: 12px;
+}
+
+.mat-mdc-input-element {
+  color: var(--textile-text) !important;
+}
+
+.mat-mdc-form-field-label {
+  color: var(--textile-muted) !important;
+}
+
+.mat-mdc-table {
+  background: rgba(255,255,255,0.94);
+}
+
+.mat-mdc-table .mat-mdc-header-row, .mat-mdc-table .mat-mdc-row {
+  border-bottom: 1px solid rgba(49,95,111,0.08);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.gap-10 {
+  gap: 10px;
+}
+
+.gap-20 {
+  gap: 20px;
+}
+

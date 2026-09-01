@@ -1,0 +1,52 @@
+<div class="dialog-header">
+  <mat-icon class="dialog-icon">{{ isEdit ? 'edit' : 'add_circle' }}</mat-icon>
+  <h2 mat-dialog-title>{{ isEdit ? 'Editar Talla' : 'Nueva Talla' }}</h2>
+</div>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="tallaForm" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Código</mat-label>
+        <input matInput formControlName="codigo" placeholder="Ej: S, M, L" required>
+        <mat-icon matPrefix>tag</mat-icon>
+        <mat-error *ngIf="tallaForm.get('codigo')?.hasError('required')">
+          El código es requerido
+        </mat-error>
+        <mat-error *ngIf="tallaForm.get('codigo')?.hasError('maxlength')">
+          El código no puede tener más de 20 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" placeholder="Ej: Small, Medium, Large" required>
+        <mat-icon matPrefix>label</mat-icon>
+        <mat-error *ngIf="tallaForm.get('nombre')?.hasError('required')">
+          El nombre es requerido
+        </mat-error>
+        <mat-error *ngIf="tallaForm.get('nombre')?.hasError('maxlength')">
+          El nombre no puede tener más de 100 caracteres
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row checkbox-row">
+      <mat-checkbox formControlName="activo" class="status-checkbox">
+        <mat-icon>check_circle</mat-icon>
+        <span>Activo</span>
+      </mat-checkbox>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="onCancel()" class="cancel-button">
+    <mat-icon>close</mat-icon>
+    Cancelar
+  </button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!tallaForm.valid" class="submit-button">
+    <mat-icon>{{ isEdit ? 'save' : 'add' }}</mat-icon>
+    {{ isEdit ? 'Actualizar' : 'Crear' }}
+  </button>
+</mat-dialog-actions>

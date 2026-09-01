@@ -1,0 +1,104 @@
+<div class="lotes-container">
+  <div class="header-actions">
+    <h1>Gestión de Lotes de Confección Textil</h1>
+    <div class="action-buttons">
+      <button mat-raised-button color="accent" (click)="abrirImportacion()">
+        <mat-icon>upload_file</mat-icon>
+        Importar Excel
+      </button>
+      <button mat-raised-button color="primary" (click)="abrirFormulario()">
+        <mat-icon>add</mat-icon>
+        Nuevo Lote
+      </button>
+    </div>
+  </div>
+
+  <mat-card *ngIf="loading">
+    <mat-card-content>
+      <mat-spinner></mat-spinner>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="!loading">
+    <mat-card-content>
+      <table mat-table [dataSource]="lotes" class="mat-elevation-z2">
+
+        <ng-container matColumnDef="mesa">
+          <th mat-header-cell *matHeaderCellDef>MESA</th>
+          <td mat-cell *matCellDef="let lote">{{ lote.mesa || '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fecha_corte">
+          <th mat-header-cell *matHeaderCellDef>FECHA DE CORTE</th>
+          <td mat-cell *matCellDef="let lote">{{ lote.fecha_corte | date:'short' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="referencia">
+          <th mat-header-cell *matHeaderCellDef>REFERENCIA</th>
+          <td mat-cell *matCellDef="let lote">{{ getReferenciaNombre(lote) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="colores">
+          <th mat-header-cell *matHeaderCellDef>COLORES</th>
+          <td mat-cell *matCellDef="let lote"><span [matTooltip]="getColoresLote(lote)">{{ getColoresLote(lote) }}</span></td>
+        </ng-container>
+
+        <ng-container matColumnDef="material_total">
+          <th mat-header-cell *matHeaderCellDef>MATERIAL Y TOTAL</th>
+          <td mat-cell *matCellDef="let lote">{{ getMaterialNombre(lote) }} · {{ getTotalLote(lote) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="tallas">
+          <th mat-header-cell *matHeaderCellDef>TALLAS</th>
+          <td mat-cell *matCellDef="let lote">{{ getTallasLote(lote) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fecha_entrega">
+          <th mat-header-cell *matHeaderCellDef>FECHA ENTREGA</th>
+          <td mat-cell *matCellDef="let lote">{{ getFechaEntrega(lote) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fecha_estimada">
+          <th mat-header-cell *matHeaderCellDef>FECHA ESTIMADA</th>
+          <td mat-cell *matCellDef="let lote">{{ getFechaEstimada(lote) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="despacha">
+          <th mat-header-cell *matHeaderCellDef>DESPACHA</th>
+          <td mat-cell *matCellDef="let lote">{{ getDespacha(lote) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="confeccionista">
+          <th mat-header-cell *matHeaderCellDef>CONFECCIONISTA</th>
+          <td mat-cell *matCellDef="let lote">{{ getConfeccionistas(lote) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="remision">
+          <th mat-header-cell *matHeaderCellDef>REMISION</th>
+          <td mat-cell *matCellDef="let lote">{{ getRemisionesString(lote) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="cantidad_total">
+          <th mat-header-cell *matHeaderCellDef>CANTIDAD TOTAL</th>
+          <td mat-cell *matCellDef="let lote">{{ getTotalLote(lote) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let lote">
+            <button mat-icon-button (click)="abrirFormulario(lote)" matTooltip="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="eliminarLote(lote.id)" matTooltip="Eliminar">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>
+

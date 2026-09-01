@@ -1,0 +1,119 @@
+<div class="chat-ia-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <h2>💬 Asistente IA</h2>
+    <button mat-icon-button (click)="limpiarChat()" matTooltip="Limpiar chat">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Área de mensajes -->
+  <div class="chat-messages" #chatContainer>
+    <!-- Sugerencias iniciales -->
+    <div class="sugerencias-section" *ngIf="mostrarSugerencias && sugerencias.length > 0">
+      <h3>Preguntas sugeridas:</h3>
+      <div class="sugerencias-grid">
+        <button 
+          *ngFor="let sugerencia of sugerencias" 
+          class="sugerencia-btn"
+          (click)="usarSugerencia(sugerencia)"
+          mat-button>
+          <mat-icon>help</mat-icon>
+          {{ sugerencia }}
+        </button>
+      </div>
+      <mat-divider></mat-divider>
+    </div>
+
+    <!-- Mensajes -->
+    <div *ngFor="let mensaje of mensajes; let i = index" 
+         class="mensaje" 
+         [class.usuario]="mensaje.rol === 'usuario'"
+         [class.ia]="mensaje.rol === 'ia'">
+      
+      <!-- Mensaje del usuario -->
+      <div *ngIf="mensaje.rol === 'usuario'" class="mensaje-content">
+        <div class="mensaje-bubble usuario-bubble">
+          {{ mensaje.contenido }}
+        </div>
+        <small class="timestamp">{{ mensaje.timestamp | date:'short' }}</small>
+      </div>
+
+      <!-- Respuesta de IA -->
+      <div *ngIf="mensaje.rol === 'ia'" class="mensaje-content">
+        <div class="mensaje-bubble ia-bubble">
+          <!-- Encabezado con tipo de análisis -->
+          <div *ngIf="mensaje.tipo" class="informe-header" [style.borderLeftColor]="getColorTipo(mensaje.tipo)">
+            <mat-icon [style.color]="getColorTipo(mensaje.tipo)">{{ getIconoTipo(mensaje.tipo) }}</mat-icon>
+            <span class="tipo-label">{{ mensaje.tipo | uppercase }}</span>
+          </div>
+
+          <!-- Contenido del mensaje con formato Markdown-like -->
+          <div class="contenido-respuesta" [innerHTML]="mensaje.contenido | safeHtml"></div>
+
+          <!-- Botones de acción si hay acciones -->
+          <div *ngIf="mensaje.acciones && mensaje.acciones.length > 0" class="acciones-section">
+            <div *ngFor="let accion of mensaje.acciones" class="accion-item">
+              <button mat-raised-button 
+                      color="primary"
+                      (click)="ejecutarAccion(accion)"
+                      class="btn-accion">
+                <mat-icon>rocket_launch</mat-icon>
+                {{ accion.titulo }}
+              </button>
+              <p class="accion-descripcion">{{ accion.descripcion }}</p>
+              <ng-container *ngIf="accion.destino">
+                <small>Destino: {{ accion.destino }}</small>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Sugerencias de seguimiento si las hay -->
+          <div *ngIf="mensaje.sugerencias && mensaje.sugerencias.length > 0" class="sugerencias-mensaje">
+            <span class="sugerencias-label">Sugerencias:</span>
+            <div class="sugerencia-chip" *ngFor="let sug of mensaje.sugerencias" (click)="usarSugerencia(sug)">
+              {{ sug }}
+            </div>
+          </div>
+
+          <!-- Botón de detalles si hay informe -->
+          <button *ngIf="mensaje.informe" 
+                  mat-icon-button 
+                  (click)="abrirDetalles(mensaje)"
+                  class="btn-detalles"
+                  matTooltip="Ver informe detallado">
+            <mat-icon>download</mat-icon>
+          </button>
+        </div>
+        <small class="timestamp">{{ mensaje.timestamp | date:'short' }}</small>
+      </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="cargando" class="mensaje ia">
+      <div class="mensaje-content">
+        <div class="mensaje-bubble ia-bubble loading">
+          <mat-spinner diameter="24"></mat-spinner>
+          <span>Procesando tu pregunta...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer - Input -->
+  <div class="chat-footer">
+    <mat-form-field class="pregunta-input" appearance="outline">
+      <mat-label>Haz una pregunta...</mat-label>
+      <input matInput 
+             [(ngModel)]="preguntaActual" 
+             (keyup.enter)="enviarPregunta()"
+             [disabled]="cargando"
+             placeholder="Pregunta sobre demanda, calidad, inventario...">
+      <button mat-icon-button matSuffix 
+              (click)="enviarPregunta()" 
+              [disabled]="cargando || !preguntaActual.trim()">
+        <mat-icon>send</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+</div>

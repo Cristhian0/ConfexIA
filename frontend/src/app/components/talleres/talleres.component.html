@@ -1,0 +1,208 @@
+<div class="talleres-container">
+  <div class="header">
+    <h1>Gestión de Talleres Externos</h1>
+    <button mat-raised-button color="primary" (click)="abrirFormularioTaller()">
+      <mat-icon>add</mat-icon>
+      Nuevo Taller
+    </button>
+  </div>
+
+  <mat-card *ngIf="talleres.length === 0 && !loading" class="empty-state">
+    <mat-card-content>
+      <p>No hay talleres registrados</p>
+      <button mat-button color="primary" (click)="abrirFormularioTaller()">Crear primer taller</button>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando talleres...</p>
+  </div>
+
+  <div *ngIf="talleres.length > 0" class="talleres-list">
+    <mat-accordion class="talleres-accordion">
+      <mat-expansion-panel *ngFor="let taller of talleres" class="taller-panel" (opened)="onPanelOpened(taller)">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="taller-header">
+              <div class="taller-info">
+                <span class="codigo">{{ taller.codigo }}</span>
+                <span class="nombre">{{ taller.nombre }}</span>
+                <mat-chip *ngIf="!taller.activo" class="inactivo">Inactivo</mat-chip>
+              </div>
+              <div class="taller-stats">
+                <span class="stat-item">
+                  <mat-icon>assignment</mat-icon>
+                  {{ getCantidadRemisiones(taller.id!) }} Remisiones
+                </span>
+              </div>
+            </div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="taller-details">
+          <!-- Información del Taller -->
+          <div class="info-section">
+            <h3>Información del Taller</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <mat-icon>business</mat-icon>
+                <div>
+                  <strong>Código:</strong> {{ taller.codigo }}
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>person</mat-icon>
+                <div>
+                  <strong>Contacto:</strong> {{ taller.contacto || 'No especificado' }}
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>phone</mat-icon>
+                <div>
+                  <strong>Teléfono:</strong> {{ taller.telefono || 'No especificado' }}
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>location_on</mat-icon>
+                <div>
+                  <strong>Dirección:</strong> {{ taller.direccion || 'No especificada' }}
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>speed</mat-icon>
+                <div>
+                  <strong>Capacidad Diaria:</strong> {{ taller.capacidad_diaria }} prendas
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>check_circle</mat-icon>
+                <div>
+                  <strong>Estado:</strong> 
+                  <mat-chip [class]="taller.activo ? 'activo' : 'inactivo'">
+                    {{ taller.activo ? 'Activo' : 'Inactivo' }}
+                  </mat-chip>
+                </div>
+              </div>
+            </div>
+            <div class="actions-row">
+              <button mat-button (click)="editarTaller(taller)">
+                <mat-icon>edit</mat-icon>
+                Editar Taller
+              </button>
+              <button mat-raised-button color="primary" (click)="asignarTrabajo(taller)">
+                <mat-icon>add_task</mat-icon>
+                Asignar Trabajo (Remisión)
+              </button>
+            </div>
+          </div>
+
+          <!-- Remisiones/Asignaciones -->
+          <div class="remisiones-section">
+            <h3>Asignaciones de Trabajo (Remisiones)</h3>
+            
+            <div *ngIf="cargandoRemisiones[taller.id!]" class="loading-remisiones">
+              <mat-spinner diameter="30"></mat-spinner>
+              <span>Cargando asignaciones...</span>
+            </div>
+
+            <div *ngIf="!cargandoRemisiones[taller.id!]">
+              <div *ngIf="(remisionesPorTaller[taller.id!] || []).length === 0" class="no-remisiones">
+                <p>Este taller no tiene asignaciones de trabajo aún.</p>
+                <button mat-button color="primary" (click)="asignarTrabajo(taller)">
+                  <mat-icon>add</mat-icon>
+                  Crear Primera Asignación
+                </button>
+              </div>
+
+              <div *ngIf="(remisionesPorTaller[taller.id!] || []).length > 0" class="remisiones-list">
+                <mat-card *ngFor="let remision of remisionesPorTaller[taller.id!]" class="remision-card">
+                  <mat-card-header>
+                    <mat-card-title>
+                      <div class="remision-header">
+                        <span class="numero-remision">{{ remision.numero_remision }}</span>
+                        <mat-chip [ngClass]="'estado-' + remision.estado">
+                          {{ getEstadoLabel(remision.estado) }}
+                        </mat-chip>
+                      </div>
+                    </mat-card-title>
+                    <mat-card-subtitle>
+                      <div class="remision-info">
+                        <span>
+                          <mat-icon>date_range</mat-icon>
+                          Remisión: {{ formatDate(remision.fecha_remision) }}
+                        </span>
+                        <span *ngIf="remision.fecha_entrega_estimada">
+                          <mat-icon>event</mat-icon>
+                          Entrega Est.: {{ formatDate(remision.fecha_entrega_estimada) }}
+                        </span>
+                        <span *ngIf="remision.lote">
+                          <mat-icon>inventory</mat-icon>
+                          Lote: {{ remision.lote.numero_lote }}
+                        </span>
+                      </div>
+                    </mat-card-subtitle>
+                  </mat-card-header>
+
+                  <mat-card-content>
+                    <div class="remision-details">
+                      <h4>Detalles de Asignación por Talla:</h4>
+                      <div class="detalles-list">
+                        <div *ngFor="let detalle of remision.detalles" class="detalle-item">
+                          <div class="detalle-header-info">
+                            <strong>Talla:</strong> {{ getTallaNombre(detalle) }}
+                            <span class="cantidad-badge">{{ detalle.cantidad }} unidades</span>
+                          </div>
+                          
+                          <div *ngIf="detalle.confeccionista_nombre || detalle.tipo_prenda || detalle.fecha_entrega_estimada" 
+                               class="confeccionista-info">
+                            <div *ngIf="detalle.confeccionista_nombre" class="info-row">
+                              <mat-icon>person</mat-icon>
+                              <span><strong>Confeccionista:</strong> {{ detalle.confeccionista_nombre }}</span>
+                            </div>
+                            <div *ngIf="detalle.tipo_prenda" class="info-row">
+                              <mat-icon>checkroom</mat-icon>
+                              <span><strong>Tipo de Prenda:</strong> {{ detalle.tipo_prenda }}</span>
+                            </div>
+                            <div *ngIf="detalle.fecha_entrega_estimada" class="info-row">
+                              <mat-icon>schedule</mat-icon>
+                              <span><strong>Fecha Entrega Est.:</strong> {{ formatDate(detalle.fecha_entrega_estimada) }}</span>
+                            </div>
+                            <div class="info-row">
+                              <mat-icon>done</mat-icon>
+                              <span>
+                                <strong>Progreso:</strong> 
+                                Recibido: {{ detalle.cantidad_recibida || 0 }} | 
+                                Entregado: {{ detalle.cantidad_entregada || 0 }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div *ngIf="remision.observaciones" class="observaciones">
+                        <strong>Observaciones:</strong> {{ remision.observaciones }}
+                      </div>
+                    </div>
+                  </mat-card-content>
+
+                  <mat-card-actions>
+                    <button mat-button (click)="verRemision(remision)">
+                      <mat-icon>visibility</mat-icon>
+                      Ver Detalles
+                    </button>
+                    <button mat-button (click)="editarRemision(remision)">
+                      <mat-icon>edit</mat-icon>
+                      Editar
+                    </button>
+                  </mat-card-actions>
+                </mat-card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>
+

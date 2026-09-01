@@ -1,0 +1,61 @@
+<div class="dialog-header">
+  <mat-icon class="dialog-icon">{{ isEdit ? 'edit' : 'palette' }}</mat-icon>
+  <h2 mat-dialog-title>{{ isEdit ? 'Editar Color' : 'Nuevo Color' }}</h2>
+</div>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="colorForm" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Código</mat-label>
+        <input matInput formControlName="codigo" placeholder="Ej: BLU, RED, GRN" required>
+        <mat-icon matPrefix>tag</mat-icon>
+        <mat-error *ngIf="colorForm.get('codigo')?.hasError('required')">
+          El código es requerido
+        </mat-error>
+        <mat-error *ngIf="colorForm.get('codigo')?.hasError('maxlength')">
+          El código no puede tener más de 20 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" placeholder="Ej: Azul Marino, Rojo Carmesí" required>
+        <mat-icon matPrefix>label</mat-icon>
+        <mat-error *ngIf="colorForm.get('nombre')?.hasError('required')">
+          El nombre es requerido
+        </mat-error>
+        <mat-error *ngIf="colorForm.get('nombre')?.hasError('maxlength')">
+          El nombre no puede tener más de 100 caracteres
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field color-field">
+        <mat-label>Paleta de color</mat-label>
+        <input matInput type="color" formControlName="color_hex">
+        <mat-icon matPrefix>palette</mat-icon>
+      </mat-form-field>
+      <div class="color-preview" [style.background]="colorForm.get('color_hex')?.value || '#000000'"></div>
+    </div>
+
+    <div class="form-row checkbox-row">
+      <mat-checkbox formControlName="activo" class="status-checkbox">
+        <mat-icon>check_circle</mat-icon>
+        <span>Activo</span>
+      </mat-checkbox>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="onCancel()" class="cancel-button">
+    <mat-icon>close</mat-icon>
+    Cancelar
+  </button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!colorForm.valid" class="submit-button">
+    <mat-icon>{{ isEdit ? 'save' : 'add' }}</mat-icon>
+    {{ isEdit ? 'Actualizar' : 'Crear' }}
+  </button>
+</mat-dialog-actions>

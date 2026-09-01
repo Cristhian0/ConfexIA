@@ -1,0 +1,175 @@
+<div class="corte-page">
+  <div class="page-head">
+    <h1>Corte — Tizado y extendido</h1>
+    <p class="muted">Órdenes de corte con tallas y cantidades (RF-04). Registra tizado, corte y sobrantes desde la API o ampliando esta pantalla.</p>
+  </div>
+
+  <mat-tab-group class="modern-tabs">
+    <mat-tab label="Órdenes">
+      <div class="tab-content">
+        <mat-card class="form-card">
+          <div class="section-kicker">Crear</div>
+          <mat-card-header>
+            <mat-card-title>Nueva orden de corte</mat-card-title>
+          </mat-card-header>
+          <mat-card-content *ngIf="form" [formGroup]="form">
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>Tipo de prenda</mat-label>
+              <input matInput formControlName="tipo_prenda" placeholder="Ej: Sudadera, Camiseta" />
+            </mat-form-field>
+
+            <div class="lineas" formArrayName="lineas">
+              <div class="linea" *ngFor="let g of lineas.controls; let i = index" [formGroupName]="i">
+                <mat-form-field appearance="outline">
+                  <mat-label>Talla</mat-label>
+                  <input matInput formControlName="talla_codigo" placeholder="S, M, L..." />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Cantidad</mat-label>
+                  <input matInput type="number" formControlName="cantidad" min="0" />
+                </mat-form-field>
+                <button mat-icon-button type="button" (click)="quitarLinea(i)" *ngIf="lineas.length > 1">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+            <button mat-stroked-button type="button" (click)="agregarLinea()">
+              <mat-icon>add</mat-icon>
+              Agregar talla
+            </button>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-raised-button color="primary" (click)="guardar()" [disabled]="form.invalid">
+              Crear orden
+            </button>
+          </mat-card-actions>
+        </mat-card>
+
+        <mat-card class="table-card">
+          <mat-card-header>
+            <mat-card-title>Órdenes registradas</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="loading" class="loading">
+              <mat-spinner diameter="36"></mat-spinner>
+            </div>
+            <table mat-table [dataSource]="ordenes" *ngIf="!loading" class="mat-elevation-z0">
+              <ng-container matColumnDef="numero">
+                <th mat-header-cell *matHeaderCellDef>Número</th>
+                <td mat-cell *matCellDef="let r">{{ r.numero_orden }}</td>
+              </ng-container>
+              <ng-container matColumnDef="prenda">
+                <th mat-header-cell *matHeaderCellDef>Prenda</th>
+                <td mat-cell *matCellDef="let r">{{ r.tipo_prenda }}</td>
+              </ng-container>
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let r">{{ r.estado }}</td>
+              </ng-container>
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let r">
+                  <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Acciones">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="abrirTizadoDialog(r)" *ngIf="r.estado?.toLowerCase() === 'borrador'">
+                      <mat-icon>tune</mat-icon>
+                      <span>Registrar Tizado</span>
+                    </button>
+                    <button mat-menu-item (click)="abrirCorteDialog(r)" *ngIf="r.estado?.toLowerCase() === 'tizado'">
+                      <mat-icon>content_cut</mat-icon>
+                      <span>Registrar Corte</span>
+                    </button>
+                    <button mat-menu-item (click)="abrirSobrantesDialog(r)" *ngIf="r.estado?.toLowerCase() === 'cortado'">
+                      <mat-icon>inventory</mat-icon>
+                      <span>Registrar Sobrantes</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="tallas">
+                <th mat-header-cell *matHeaderCellDef>Tallas</th>
+                <td mat-cell *matCellDef="let r">{{ formatLineas(r.lineas) }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+            <p *ngIf="!loading && !ordenes.length" class="muted">No hay órdenes aún.</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Merma">
+      <div class="tab-content">
+        <mat-card class="form-card">
+          <mat-card-header>
+            <mat-card-title>Registrar Merma</mat-card-title>
+          </mat-card-header>
+          <mat-card-content [formGroup]="mermaForm">
+            <div class="merma-grid">
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>Corte</mat-label>
+                <input matInput formControlName="corte" placeholder="Ej: Corte A" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>Tipo de corte</mat-label>
+                <input matInput formControlName="tipo_corte" placeholder="Ej: Principal, Ribete" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>Medida</mat-label>
+                <input matInput formControlName="medida" placeholder="Ej: 35 cm" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>Peso</mat-label>
+                <input matInput type="number" formControlName="peso" min="0" />
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-raised-button color="primary" (click)="guardarMerma()" [disabled]="mermaForm.invalid">
+              Guardar merma
+            </button>
+          </mat-card-actions>
+        </mat-card>
+
+        <mat-card class="table-card">
+          <mat-card-header>
+            <mat-card-title>Listado de mermas</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table *ngIf="mermas.length; else noMermas" class="merma-table">
+              <thead>
+                <tr>
+                  <th>Corte</th>
+                  <th>Tipo de corte</th>
+                  <th>Medida</th>
+                  <th>Peso</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let merma of mermas; let i = index">
+                  <td>{{ merma.corte }}</td>
+                  <td>{{ merma.tipo_corte }}</td>
+                  <td>{{ merma.medida }}</td>
+                  <td>{{ merma.peso }}</td>
+                  <td>
+                    <button mat-icon-button type="button" aria-label="Eliminar merma" (click)="borrarMerma(i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <ng-template #noMermas>
+              <p class="muted">No hay mermas registradas.</p>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

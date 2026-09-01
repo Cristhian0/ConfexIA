@@ -1,0 +1,181 @@
+<ng-container *ngIf="auth.isLoggedIn(); else loginOnly">
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #sidenav mode="side" opened class="app-sidenav">
+    <div class="brand">
+      <div class="brand-mark">CT</div>
+      <div class="brand-text">
+        <span class="brand-title">TexAI</span>
+        <span class="brand-sub">Operación y trazabilidad</span>
+      </div>
+    </div>
+    <mat-nav-list class="nav-list">
+      <a mat-list-item routerLink="/inicio" routerLinkActive="active">
+        <mat-icon>home</mat-icon>
+        <span class="nav-order">01</span>
+        <span>Inicio / Dashboard</span>
+      </a>
+
+      <a mat-list-item routerLink="/chat-ia" routerLinkActive="active">
+        <mat-icon>smart_toy</mat-icon>
+        <span class="nav-order">02</span>
+        <span>Asistente IA / Predicciones</span>
+      </a>
+
+      <a mat-list-item routerLink="/financiero" routerLinkActive="active">
+        <mat-icon>bar_chart</mat-icon>
+        <span class="nav-order">03</span>
+        <span>Reportes</span>
+      </a>
+
+      <mat-divider></mat-divider>
+
+      <a mat-list-item routerLink="/catalogo" routerLinkActive="active">
+        <mat-icon>view_module</mat-icon>
+        <span class="nav-order">04</span>
+        <span>Catálogo</span>
+      </a>
+      <a mat-list-item routerLink="/tela" routerLinkActive="active">
+        <mat-icon>texture</mat-icon>
+        <span class="nav-order">05</span>
+        <span>Tela</span>
+      </a>
+      <a mat-list-item routerLink="/bodega" routerLinkActive="active">
+        <mat-icon>warehouse</mat-icon>
+        <span class="nav-order">06</span>
+        <span>Bodega</span>
+      </a>
+      <a mat-list-item routerLink="/catalogo" routerLinkActive="active">
+        <mat-icon>inventory_2</mat-icon>
+        <span class="nav-order">07</span>
+        <span>Materia Prima</span>
+      </a>
+
+      <mat-divider></mat-divider>
+
+      <a mat-list-item routerLink="/corte" routerLinkActive="active">
+        <mat-icon>content_cut</mat-icon>
+        <span class="nav-order">08</span>
+        <span>Corte y merma</span>
+      </a>
+      <a mat-list-item routerLink="/lotes" routerLinkActive="active">
+        <mat-icon>inventory_2</mat-icon>
+        <span class="nav-order">09</span>
+        <span>Lotes</span>
+      </a>
+      <a mat-list-item routerLink="/talleres" routerLinkActive="active">
+        <mat-icon>engineering</mat-icon>
+        <span class="nav-order">10</span>
+        <span>Talleres</span>
+      </a>
+
+      <mat-divider></mat-divider>
+
+      <a mat-list-item routerLink="/calidad" routerLinkActive="active">
+        <mat-icon>fact_check</mat-icon>
+        <span class="nav-order">11</span>
+        <span>Calidad</span>
+      </a>
+      <a mat-list-item routerLink="/producto-terminado" routerLinkActive="active">
+        <mat-icon>inventory</mat-icon>
+        <span class="nav-order">12</span>
+        <span>Producto Terminado</span>
+      </a>
+
+      <mat-divider></mat-divider>
+
+      <a mat-list-item routerLink="/remisiones" routerLinkActive="active">
+        <mat-icon>local_shipping</mat-icon>
+        <span class="nav-order">13</span>
+        <span>Inventario y remisiones</span>
+      </a>
+      <a mat-list-item routerLink="/colillas" routerLinkActive="active">
+        <mat-icon>receipt</mat-icon>
+        <span class="nav-order">14</span>
+        <span>Colillas</span>
+      </a>
+      <a mat-list-item routerLink="/documentos" routerLinkActive="active">
+        <mat-icon>picture_as_pdf</mat-icon>
+        <span class="nav-order">15</span>
+        <span>Documentos PDF</span>
+      </a>
+
+      <mat-divider></mat-divider>
+
+      <a mat-list-item routerLink="/financiero" routerLinkActive="active">
+        <mat-icon>attach_money</mat-icon>
+        <span class="nav-order">16</span>
+        <span>Costos & Catálogo</span>
+      </a>
+
+      <mat-divider></mat-divider>
+
+      <button mat-list-item type="button" class="sidebar-logout-btn" (click)="logout()" aria-label="Cerrar sesión y volver al menú principal">
+        <mat-icon>logout</mat-icon>
+        <span class="nav-order">18</span>
+        <span>Cerrar sesión / cambiar perfil</span>
+      </button>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main-content">
+    <mat-toolbar class="top-toolbar">
+      <button mat-icon-button type="button" (click)="sidenav.toggle()" aria-label="Menú">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="toolbar-title">{{ title }}</span>
+      <span class="spacer"></span>
+      <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+        <mat-label>Buscar</mat-label>
+        <input matInput placeholder="Lotes, órdenes, remisiones…" disabled />
+      </mat-form-field>
+      <span class="user-label">Administrador</span>
+    </mat-toolbar>
+    <div class="container">
+      <div class="page-header">
+        <div class="page-breadcrumbs">
+          <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+            <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.label }}</a>
+            <span *ngIf="!last"> / </span>
+            <span *ngIf="last">{{ crumb.label }}</span>
+          </ng-container>
+        </div>
+        <h1 class="page-title">{{ pageTitle }}</h1>
+      </div>
+      <router-outlet></router-outlet>
+    </div>
+      <div class="auth-controls" style="position:absolute;right:16px;top:12px;">
+        <button mat-button *ngIf="!auth.isLoggedIn()" (click)="openLogin()">Iniciar sesión</button>
+        <button mat-button *ngIf="auth.isLoggedIn()" (click)="logout()">Cerrar sesión</button>
+        <span *ngIf="role" style="margin-left:8px">{{ role }}</span>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</ng-container>
+
+<!-- Widget flotante de chat IA -->
+<app-chat-floating-button></app-chat-floating-button>
+
+<ng-template #loginOnly>
+  <div class="landing-hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <div class="badge">Plataforma inteligente para industria textil</div>
+        <h1>TexAI: la plataforma <span class="accent">inteligente</span> para la industria textil</h1>
+        <p class="hero-sub">Desde el rollo de tela hasta la entrega final, cada movimiento queda registrado, controlado y optimizado con inteligencia artificial.</p>
+        <div class="hero-actions">
+          <button mat-raised-button color="primary" (click)="openLogin()">Iniciar sesión</button>
+        </div>
+      </div>
+      <div class="hero-illustration" aria-hidden="true">
+        <!-- ilustración decorativa con gráfica demo -->
+        <div class="illustration-box">
+          <app-landing-chart></app-landing-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="demo-section">
+    <app-demo></app-demo>
+  </div>
+</ng-template>

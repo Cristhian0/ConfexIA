@@ -1,0 +1,63 @@
+<div class="dialog-header">
+  <mat-icon class="dialog-icon">{{ isEdit ? 'edit' : 'texture' }}</mat-icon>
+  <h2 mat-dialog-title>{{ isEdit ? 'Editar Material' : 'Nuevo Material' }}</h2>
+</div>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="materialForm" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Código</mat-label>
+        <input matInput formControlName="codigo" placeholder="Ej: ALG, POL, FLE" required>
+        <mat-icon matPrefix>tag</mat-icon>
+        <mat-error *ngIf="materialForm.get('codigo')?.hasError('required')">
+          El código es requerido
+        </mat-error>
+        <mat-error *ngIf="materialForm.get('codigo')?.hasError('maxlength')">
+          El código no puede tener más de 20 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" placeholder="Ej: Algodón, Poliéster, Fleece" required>
+        <mat-icon matPrefix>label</mat-icon>
+        <mat-error *ngIf="materialForm.get('nombre')?.hasError('required')">
+          El nombre es requerido
+        </mat-error>
+        <mat-error *ngIf="materialForm.get('nombre')?.hasError('maxlength')">
+          El nombre no puede tener más de 100 caracteres
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field full-width">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="descripcion" rows="3" placeholder="Descripción opcional del material"></textarea>
+        <mat-icon matPrefix>description</mat-icon>
+        <mat-error *ngIf="materialForm.get('descripcion')?.hasError('maxlength')">
+          La descripción no puede tener más de 200 caracteres
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row checkbox-row">
+      <mat-checkbox formControlName="activo" class="status-checkbox">
+        <mat-icon>check_circle</mat-icon>
+        <span>Activo</span>
+      </mat-checkbox>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="onCancel()" class="cancel-button">
+    <mat-icon>close</mat-icon>
+    Cancelar
+  </button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!materialForm.valid" class="submit-button">
+    <mat-icon>{{ isEdit ? 'save' : 'add' }}</mat-icon>
+    {{ isEdit ? 'Actualizar' : 'Crear' }}
+  </button>
+</mat-dialog-actions>

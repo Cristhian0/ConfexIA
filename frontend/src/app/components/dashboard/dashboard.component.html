@@ -1,0 +1,356 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Dashboard - Proceso de Confección Textil</h1>
+    <p>Vista general del proceso productivo</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner></mat-spinner>
+    <p>Cargando datos del sistema...</p>
+  </div>
+
+  <!-- Flujo del Proceso Productivo -->
+  <div class="process-flow">
+    <h2>Flujo del Proceso Productivo</h2>
+    <div class="flow-diagram">
+      <div class="flow-step" *ngFor="let step of processSteps; let i = index">
+        <div class="step-number">{{ i + 1 }}</div>
+        <div class="step-icon">
+          <mat-icon>{{ step.icon }}</mat-icon>
+        </div>
+        <div class="step-label">{{ step.label }}</div>
+        <div class="step-status" [ngClass]="step.status.toLowerCase()">
+          {{ step.status }}
+        </div>
+        <svg *ngIf="i < processSteps.length - 1" class="arrow" viewBox="0 0 20 20">
+          <path d="M 0 10 L 15 10 M 10 5 L 15 10 L 10 15" stroke="currentColor" fill="none" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Métricas Principales -->
+  <div class="metrics-section" *ngIf="estadisticas">
+    <div class="metrics-grid">
+      <mat-card class="metric-card">
+        <mat-card-content>
+          <div class="metric-header">
+            <mat-icon>inventory_2</mat-icon>
+            <span>Rollos de Tela</span>
+          </div>
+          <div class="metric-value">0</div>
+          <div class="metric-label">Total en inventario</div>
+          <div class="metric-change">Sin datos</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card">
+        <mat-card-content>
+          <div class="metric-header">
+            <mat-icon>content_cut</mat-icon>
+            <span>Órdenes de Corte</span>
+          </div>
+          <div class="metric-value">0</div>
+          <div class="metric-label">En proceso</div>
+          <div class="metric-change">Sin datos</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card">
+        <mat-card-content>
+          <div class="metric-header">
+            <mat-icon>local_shipping</mat-icon>
+            <span>Remisiones a Taller</span>
+          </div>
+          <div class="metric-value">0</div>
+          <div class="metric-label">Activas</div>
+          <div class="metric-change">Sin datos</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card">
+        <mat-card-content>
+          <div class="metric-header">
+            <mat-icon>precision_manufacturing</mat-icon>
+            <span>Lotes de Producción</span>
+          </div>
+          <div class="metric-value">0</div>
+          <div class="metric-label">Activos</div>
+          <div class="metric-change">Sin datos</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card">
+        <mat-card-content>
+          <div class="metric-header">
+            <mat-icon>fact_check</mat-icon>
+            <span>Control de Calidad</span>
+          </div>
+          <div class="metric-value">0</div>
+          <div class="metric-label">En revisión</div>
+          <div class="metric-change">Sin datos</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card">
+        <mat-card-content>
+          <div class="metric-header">
+            <mat-icon>done_all</mat-icon>
+            <span>Productos Terminados</span>
+          </div>
+          <div class="metric-value">0</div>
+          <div class="metric-label">Unidades</div>
+          <div class="metric-change">Sin datos</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Gráficos y Análisis -->
+  <div class="charts-section" *ngIf="estadisticas">
+    <div class="charts-grid">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Estado del Proceso Productivo</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <canvas id="processStateChart" #processChart></canvas>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Producción por Estado (Lotes)</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <canvas id="productionByStateChart" #productionChart></canvas>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Inventario de Bodega -->
+    <mat-card class="inventory-card">
+      <mat-card-header>
+        <mat-card-title>Inventario de Bodega</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="inventarioBodega" class="inventory-table">
+          <ng-container matColumnDef="producto">
+            <th mat-header-cell *matHeaderCellDef>Producto</th>
+            <td mat-cell *matCellDef="let item">{{ item.producto }}</td>
+          </ng-container>
+          <ng-container matColumnDef="disponible">
+            <th mat-header-cell *matHeaderCellDef>Disponible</th>
+            <td mat-cell *matCellDef="let item">{{ item.disponible }}</td>
+          </ng-container>
+          <ng-container matColumnDef="unidad">
+            <th mat-header-cell *matHeaderCellDef>Unidad</th>
+            <td mat-cell *matCellDef="let item">{{ item.unidad }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['producto', 'disponible', 'unidad']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['producto', 'disponible', 'unidad'];"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Análisis de IA e Inteligencia Artificial -->
+  <app-ia-insights *ngIf="estadisticas"></app-ia-insights>
+
+  <!-- Alertas y Actividad Reciente -->
+  <div class="alerts-activity-section" *ngIf="estadisticas">
+    <div class="two-column-grid">
+      <mat-card class="alerts-card">
+        <mat-card-header>
+          <mat-card-title>Alertas y Notificaciones</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>No hay alertas registradas todavía.</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="activity-card">
+        <mat-card-header>
+          <mat-card-title>Actividad Reciente</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>No hay actividad reciente para mostrar.</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Sección: Resumen Ejecutivo (Original) -->
+  <div class="section" *ngIf="estadisticas">
+    <h2><mat-icon>analytics</mat-icon> Resumen Ejecutivo</h2>
+    <div class="stats-grid">
+      <!-- Estadísticas de Prendas -->
+      <mat-card class="stat-card process-card inventory">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>checkroom</mat-icon>
+          <mat-card-title>Prendas</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-item">
+            <span class="stat-label">Total:</span>
+            <span class="stat-value">{{ estadisticas.prendas.total }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">En Proceso:</span>
+            <span class="stat-value">{{ estadisticas.prendas.en_corte + estadisticas.prendas.en_taller }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Completadas:</span>
+            <span class="stat-value">{{ estadisticas.prendas.confeccionadas }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Entregadas:</span>
+            <span class="stat-value">{{ estadisticas.prendas.entregadas }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Lotes por Estado -->
+      <mat-card class="stat-card process-card cutting">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>content_cut</mat-icon>
+          <mat-card-title>Lotes por Estado</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-item">
+            <span class="stat-label">En Proceso:</span>
+            <span class="stat-value">{{ (estadisticas.lotes_por_estado['en_corte'] || 0) + (estadisticas.lotes_por_estado['en_taller'] || 0) }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Completados:</span>
+            <span class="stat-value">{{ estadisticas.lotes_por_estado['completado'] || 0 }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Resumen General -->
+      <mat-card class="stat-card process-card production">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>precision_manufacturing</mat-icon>
+          <mat-card-title>Operaciones</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-item">
+            <span class="stat-label">Talleres Activos:</span>
+            <span class="stat-value">{{ estadisticas.talleres_activos }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Remisiones Pendientes:</span>
+            <span class="stat-value">{{ estadisticas.remisiones_pendientes }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Fallas Pendientes:</span>
+            <span class="stat-value">{{ estadisticas.fallas_pendientes }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Pedidos Especiales:</span>
+            <span class="stat-value">{{ estadisticas.pedidos_especiales }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Sección: Seguimiento de Procesos -->
+  <div class="section">
+    <h2><mat-icon>timeline</mat-icon> Seguimiento de Procesos Textiles</h2>
+
+    <!-- Proceso: Inventario de Tela -->
+    <div class="process-section">
+      <h3><mat-icon>inventory_2</mat-icon> 1. Inventario de Tela</h3>
+      <p>Gestión de rollos, materiales y colores disponibles.</p>
+      <div class="process-actions">
+        <button mat-raised-button color="primary" routerLink="/bodega">
+          <mat-icon>warehouse</mat-icon> Ver Inventario
+        </button>
+        <button mat-raised-button routerLink="/bodega">
+          <mat-icon>add</mat-icon> Ingresar Tela
+        </button>
+      </div>
+    </div>
+
+    <!-- Proceso: Corte -->
+    <div class="process-section">
+      <h3><mat-icon>content_cut</mat-icon> 2. Corte</h3>
+      <p>Programación y ejecución de órdenes de corte.</p>
+      <div class="process-actions">
+        <button mat-raised-button color="primary" routerLink="/corte">
+          <mat-icon>cut</mat-icon> Gestionar Cortes
+        </button>
+        <button mat-raised-button routerLink="/corte">
+          <mat-icon>schedule</mat-icon> Programar Orden
+        </button>
+      </div>
+    </div>
+
+    <!-- Proceso: Confección -->
+    <div class="process-section">
+      <h3><mat-icon>precision_manufacturing</mat-icon> 3. Confección</h3>
+      <p>Seguimiento de producción en talleres y remisiones.</p>
+      <div class="process-actions">
+        <button mat-raised-button color="primary" routerLink="/calidad">
+          <mat-icon>engineering</mat-icon> Ver Producción
+        </button>
+        <button mat-raised-button routerLink="/talleres">
+          <mat-icon>group</mat-icon> Gestionar Talleres
+        </button>
+      </div>
+    </div>
+
+    <!-- Proceso: Control de Calidad -->
+    <div class="process-section">
+      <h3><mat-icon>fact_check</mat-icon> 4. Control de Calidad</h3>
+      <p>Inspecciones y control de defectos en prendas.</p>
+      <div class="process-actions">
+        <button mat-raised-button color="primary" routerLink="/calidad">
+          <mat-icon>verified</mat-icon> Ver Calidad
+        </button>
+        <button mat-raised-button routerLink="/calidad">
+          <mat-icon>search</mat-icon> Nueva Inspección
+        </button>
+      </div>
+    </div>
+
+    <!-- Proceso: Producto Terminado -->
+    <div class="process-section">
+      <h3><mat-icon>local_shipping</mat-icon> 5. Producto Terminado</h3>
+      <p>Almacenamiento y documentación de prendas terminadas.</p>
+      <div class="process-actions">
+        <button mat-raised-button color="primary" routerLink="/remisiones">
+          <mat-icon>inventory</mat-icon> Ver PT
+        </button>
+        <button mat-raised-button routerLink="/documentos">
+          <mat-icon>description</mat-icon> Generar NOC
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Sección: Resumen Ejecutivo (Original) -->
+  <div class="section" *ngIf="estadisticas">
+    <h2><mat-icon>analytics</mat-icon> Resumen Ejecutivo</h2>
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>checkroom</mat-icon>
+          <mat-card-title>Prendas</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-item">
+            <span class="stat-label">Total:</span>
+            <span class="stat-value">{{ estadisticas.prendas.total }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

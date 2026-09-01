@@ -1,0 +1,180 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Lote' : 'Nuevo Lote' }}</h2>
+
+<mat-dialog-content>
+
+  <form [formGroup]="form" class="lote-form">
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Número de Lote</mat-label>
+        <input matInput formControlName="numero_lote" required placeholder="Ej: LOTE-001">
+        <mat-error *ngIf="form.get('numero_lote')?.hasError('required')">Requerido</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Mesa</mat-label>
+        <input matInput formControlName="mesa" placeholder="Ej: Mesa 1">
+        <mat-hint>Mesa de corte</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="small-field">
+        <mat-label>Confeccionista</mat-label>
+        <input matInput formControlName="confeccionista_nombre" placeholder="Nombre del confeccionista">
+      </mat-form-field>
+
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Referencia</mat-label>
+        <mat-select formControlName="referencia_nombre" required>
+          <mat-option *ngIf="referencias.length === 0" disabled>No hay referencias disponibles</mat-option>
+          <mat-option *ngFor="let ref of referencias" [value]="ref.nombre">
+            {{ ref.nombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('referencia_nombre')?.hasError('required')">Requerido</mat-error>
+        <mat-hint *ngIf="referencias.length === 0">Debe crear referencias en el catálogo primero</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Material</mat-label>
+        <mat-select formControlName="material_nombre" required>
+          <mat-option *ngIf="materiales.length === 0" disabled>No hay materiales disponibles</mat-option>
+          <mat-option *ngFor="let material of materiales" [value]="material.nombre">
+            {{ material.nombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('material_nombre')?.hasError('required')">Requerido</mat-error>
+        <mat-hint *ngIf="materiales.length === 0">Debe crear materiales en el catálogo primero</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field class="full-width">
+        <mat-label>Orden de Corte (Opcional)</mat-label>
+        <mat-select formControlName="orden_corte_id">
+          <mat-option [value]="null">Sin orden de corte asociada</mat-option>
+          <mat-option *ngFor="let orden of ordenesCorte" [value]="orden.id">
+            {{ orden.numero_orden }} - {{ orden.tipo_prenda }} ({{ orden.estado }})
+          </mat-option>
+        </mat-select>
+        <mat-hint>Asociar este lote con una orden de corte existente para trazabilidad</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field>
+        <mat-label>Fecha de Corte</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="fecha_corte" required>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Fecha Entrega</mat-label>
+        <input matInput [matDatepicker]="pickerEntrega" formControlName="fecha_entrega">
+        <mat-datepicker-toggle matSuffix [for]="pickerEntrega"></mat-datepicker-toggle>
+        <mat-datepicker #pickerEntrega></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Fecha Entrega Estimada</mat-label>
+        <input matInput [matDatepicker]="pickerEntregaEst" formControlName="fecha_entrega_estimada">
+        <mat-datepicker-toggle matSuffix [for]="pickerEntregaEst"></mat-datepicker-toggle>
+        <mat-datepicker #pickerEntregaEst></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Despacha</mat-label>
+        <mat-select formControlName="despacha">
+          <mat-option [value]="false">No</mat-option>
+          <mat-option [value]="true">Sí</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Prioridad</mat-label>
+        <mat-select formControlName="prioridad">
+          <mat-option [value]="0">Normal</mat-option>
+          <mat-option [value]="1">Alta</mat-option>
+          <mat-option [value]="2">Urgente</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Cantidad Total Programada</mat-label>
+        <input matInput type="number" formControlName="cantidad_total_programada" min="0" readonly>
+        <mat-hint>Total: <strong>{{ calcularTotal() }}</strong> unidades</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <mat-checkbox formControlName="es_pedido_especial">Pedido Especial</mat-checkbox>
+
+    <mat-form-field class="full-width">
+      <mat-label>Observaciones</mat-label>
+      <textarea matInput formControlName="observaciones" rows="3"></textarea>
+    </mat-form-field>
+
+    <div class="detalles-section">
+      <h3>Detalles por Color y Talla</h3>
+      <p class="hint-text">Agregue las cantidades programadas por cada combinación de color y talla</p>
+      <div formArrayName="detalles">
+        <div *ngFor="let detalle of detalles.controls; let i = index" [formGroupName]="i" class="detalle-row">
+          <mat-form-field>
+            <mat-label>Color</mat-label>
+            <mat-select formControlName="color_nombre" required>
+              <mat-option *ngIf="colores.length === 0" disabled>No hay colores disponibles</mat-option>
+              <mat-option *ngFor="let color of colores" [value]="color.nombre">
+                {{ color.codigo }} - {{ color.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Talla</mat-label>
+            <mat-select formControlName="talla_id" required>
+              <mat-option *ngIf="tallas.length === 0" disabled>No hay tallas disponibles</mat-option>
+              <mat-option *ngFor="let talla of tallas" [value]="talla.id">
+                {{ talla.codigo }} - {{ talla.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Cantidad</mat-label>
+            <input matInput type="number" formControlName="cantidad" required min="1" (input)="actualizarTotal()" (change)="actualizarTotal()">
+          </mat-form-field>
+          <button mat-icon-button type="button" (click)="eliminarDetalle(i)" *ngIf="detalles.length > 1" matTooltip="Eliminar">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+      <button mat-button type="button" (click)="agregarDetalle()">
+        <mat-icon>add</mat-icon>
+        Agregar Color/Talla
+      </button>
+    </div>
+
+    <div class="resumen-section" *ngIf="getTotalesPorTalla().length > 0">
+      <h3>Resumen por Talla</h3>
+      <table class="resumen-table">
+        <thead>
+          <tr>
+            <th>Talla</th>
+            <th>Total Unidades</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of getTotalesPorTalla()">
+            <td>{{ item.talla }}</td>
+            <td>{{ item.total }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="guardar()" [disabled]="!form.valid || detalles.length === 0">
+    Guardar
+  </button>
+</mat-dialog-actions>
+

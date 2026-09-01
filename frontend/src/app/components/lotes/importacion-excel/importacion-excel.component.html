@@ -1,0 +1,42 @@
+<h2 mat-dialog-title>Importar Lotes desde Excel</h2>
+
+<mat-dialog-content>
+  <div class="importacion-container">
+    <p><strong>Formato del archivo Excel:</strong></p>
+    <p>El archivo debe contener las siguientes columnas:</p>
+    <ul>
+      <li><strong>Mesa</strong> (opcional): Mesa de corte</li>
+      <li><strong>Fecha Corte</strong> (opcional): Fecha del corte</li>
+      <li><strong>Referencia</strong> (requerido): Código o nombre de la referencia</li>
+      <li><strong>Material</strong> (requerido): Código o nombre del material</li>
+      <li><strong>Color</strong> (requerido): Código o nombre del color</li>
+      <li><strong>Talla</strong> (requerido): Código de la talla</li>
+      <li><strong>Cantidad</strong> (requerido): Cantidad programada</li>
+      <li><strong>Observaciones</strong> (opcional): Observaciones adicionales</li>
+      <li><strong>Prioridad</strong> (opcional): 0=Normal, 1=Alta, 2=Urgente</li>
+    </ul>
+
+    <div class="file-upload">
+      <input type="file" #fileInput accept=".xlsx,.xls" (change)="onFileSelected($event)" style="display: none">
+      <button mat-raised-button (click)="fileInput.click()" [disabled]="uploading">
+        <mat-icon>attach_file</mat-icon>
+        Seleccionar Archivo
+      </button>
+      <span *ngIf="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+    </div>
+
+    <div *ngIf="uploading" class="uploading">
+      <mat-spinner diameter="30"></mat-spinner>
+      <span>Importando...</span>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="cancelar()" [disabled]="uploading">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="importar()" [disabled]="!selectedFile || uploading">
+    <mat-icon>upload</mat-icon>
+    Importar
+  </button>
+</mat-dialog-actions>
+

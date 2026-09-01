@@ -1,0 +1,14 @@
+<mat-card class="assistant-card">
+  <mat-card-header>
+    <div mat-card-avatar class="assistant-avatar">AI</div>
+    <mat-card-title>ASISTENTE IA</mat-card-title>
+    <mat-card-subtitle>Objetivo: Apoyar la toma de decisiones</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <p class="desc">Consultas rápidas y ejemplos útiles para guiarte.</p>
+
+    <div class="examples">
+      <div class="example" *ngFor="let e of examples" (click)="askExample(e)">• {{ e }}</div>
+    </div>
+  </mat-card-content>
+</mat-card>

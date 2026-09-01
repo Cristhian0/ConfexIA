@@ -1,0 +1,67 @@
+<div class="colores-container">
+  <div class="header-actions">
+    <h2>
+      <mat-icon>palette</mat-icon>
+      Colores
+    </h2>
+    <button mat-raised-button color="primary" (click)="nuevoColor()">
+      <mat-icon>add</mat-icon>
+      Nuevo Color
+    </button>
+  </div>
+
+  <mat-card *ngIf="loading">
+    <mat-card-content>
+      <mat-spinner></mat-spinner>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="!loading">
+    <mat-card-content>
+      <table mat-table [dataSource]="colores" class="mat-elevation-z2">
+        <ng-container matColumnDef="codigo">
+          <th mat-header-cell *matHeaderCellDef>Código</th>
+          <td mat-cell *matCellDef="let color">{{ color.codigo }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
+          <td mat-cell *matCellDef="let color">{{ color.nombre }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="color_hex">
+          <th mat-header-cell *matHeaderCellDef>Color</th>
+          <td mat-cell *matCellDef="let color">
+            <span class="color-swatch" [style.background]="color.color_hex || '#ffffff'"></span>
+            {{ color.color_hex || 'No definido' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="activo">
+          <th mat-header-cell *matHeaderCellDef>Activo</th>
+          <td mat-cell *matCellDef="let color">
+            <mat-chip [color]="color.activo ? 'primary' : 'warn'">
+              {{ color.activo ? 'Sí' : 'No' }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let color">
+            <button mat-icon-button class="action-button" matTooltip="Editar" aria-label="Editar" (click)="editarColor(color)">
+              <mat-icon color="primary">edit</mat-icon>
+            </button>
+            <button mat-icon-button class="action-button" matTooltip="Eliminar" aria-label="Eliminar" (click)="eliminarColor(color)">
+              <mat-icon color="warn">delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>
+

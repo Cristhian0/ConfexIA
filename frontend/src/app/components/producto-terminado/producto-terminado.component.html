@@ -1,0 +1,148 @@
+<div class="producto-terminado-container">
+  <h1>Inventario Producto Terminado</h1>
+
+  <div class="mensajes">
+    <div *ngIf="success" class="mensaje exito">{{ success }}</div>
+    <div *ngIf="error" class="mensaje error">{{ error }}</div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-form">
+      <h2>Registrar ingreso de prendas (RF-19)</h2>
+      <form [formGroup]="ingresoForm" (ngSubmit)="registrarIngreso()">
+        <div class="fila">
+          <label>SKU</label>
+          <input formControlName="sku" type="text" />
+        </div>
+        <div class="fila">
+          <label>Tipo</label>
+          <input formControlName="tipo" type="text" />
+        </div>
+        <div class="fila">
+          <label>Talla</label>
+          <select formControlName="talla_id">
+            <option value="">Seleccionar talla</option>
+            <option *ngFor="let talla of tallas" [value]="talla.id">{{ talla.nombre }}</option>
+          </select>
+        </div>
+        <div class="fila">
+          <label>Color</label>
+          <select formControlName="color_id">
+            <option value="">Seleccionar color</option>
+            <option *ngFor="let color of colores" [value]="color.id">{{ color.nombre }}</option>
+          </select>
+        </div>
+        <div class="fila">
+          <label>Zona</label>
+          <select formControlName="zona">
+            <option *ngFor="let zona of zonas" [value]="zona">{{ zona }}</option>
+          </select>
+        </div>
+        <div class="fila">
+          <label>Cantidad</label>
+          <input formControlName="cantidad_actual" type="number" min="1" />
+        </div>
+        <div class="fila">
+          <label>Descripción</label>
+          <textarea formControlName="descripcion"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">Registrar Ingreso</button>
+      </form>
+    </div>
+
+    <div class="panel-lista">
+      <h2>Stock de Producto Terminado</h2>
+      <div class="filtros">
+        <form [formGroup]="filtroForm">
+          <div class="fila">
+            <input placeholder="SKU" formControlName="sku" />
+            <input placeholder="Tipo" formControlName="tipo" />
+            <select formControlName="talla_id">
+              <option value="">Talla</option>
+              <option *ngFor="let talla of tallas" [value]="talla.id">{{ talla.nombre }}</option>
+            </select>
+            <select formControlName="color_id">
+              <option value="">Color</option>
+              <option *ngFor="let color of colores" [value]="color.id">{{ color.nombre }}</option>
+            </select>
+            <select formControlName="zona">
+              <option value="">Zona</option>
+              <option *ngFor="let zona of zonas" [value]="zona">{{ zona }}</option>
+            </select>
+          </div>
+          <div class="fila acciones">
+            <button class="btn btn-secondary" type="button" (click)="buscarStock()">Filtrar</button>
+            <button class="btn btn-secondary" type="button" (click)="limpiarFiltros()">Limpiar</button>
+          </div>
+        </form>
+      </div>
+
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Tipo</th>
+            <th>Talla</th>
+            <th>Color</th>
+            <th>Zona</th>
+            <th>Cantidad</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of stock">
+            <td>{{ item.sku }}</td>
+            <td>{{ item.tipo }}</td>
+            <td>{{ item.talla_nombre || item.talla_id }}</td>
+            <td>{{ item.color_nombre || item.color_id }}</td>
+            <td>{{ item.zona }}</td>
+            <td>{{ item.cantidad_actual }}</td>
+            <td>
+              <button class="btn btn-sm btn-info" (click)="seleccionarStock(item)">Ver</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="selectedStock" class="detalle">
+    <button class="btn btn-secondary btn-sm" (click)="cerrarDetalle()">Volver</button>
+    <h2>Detalle SKU {{ selectedStock.sku }}</h2>
+    <div class="detalle-grid">
+      <div><strong>Tipo:</strong> {{ selectedStock.tipo }}</div>
+      <div><strong>Talla:</strong> {{ selectedStock.talla_nombre || selectedStock.talla_id }}</div>
+      <div><strong>Color:</strong> {{ selectedStock.color_nombre || selectedStock.color_id }}</div>
+      <div><strong>Zona:</strong> {{ selectedStock.zona }}</div>
+      <div><strong>Cantidad:</strong> {{ selectedStock.cantidad_actual }}</div>
+    </div>
+
+    <div class="acciones-zona">
+      <label>Actualizar zona</label>
+      <select #zonaSelect>
+        <option *ngFor="let zona of zonas" [value]="zona">{{ zona }}</option>
+      </select>
+      <button class="btn btn-warning btn-sm" (click)="actualizarZona(zonaSelect.value)">Actualizar</button>
+    </div>
+
+    <h3>Movimientos</h3>
+    <table class="tabla movimientos">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Cantidad</th>
+          <th>Descripción</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mov of movimientos">
+          <td>{{ mov.tipo }}</td>
+          <td>{{ mov.cantidad }}</td>
+          <td>{{ mov.descripcion || '-' }}</td>
+          <td>{{ mov.fecha_movimiento | date: 'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

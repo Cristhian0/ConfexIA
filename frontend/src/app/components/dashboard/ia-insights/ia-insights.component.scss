@@ -1,0 +1,463 @@
+// Estilos para componente de Insights de IA
+
+.ia-insights-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// Encabezado
+.insights-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 15px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+
+    mat-icon {
+      font-size: 28px;
+      color: #1976d2;
+    }
+  }
+
+  button mat-icon.spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+}
+
+// Loading
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 15px;
+  color: #666;
+  font-size: 14px;
+}
+
+// Error
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background-color: #ffebee;
+  border-left: 4px solid #f44336;
+  border-radius: 4px;
+  color: #c62828;
+
+  mat-icon {
+    color: #f44336;
+  }
+}
+
+// Contenido
+.insights-content {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+// Grid de Insights
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+// Card de Insight
+.insight-card {
+  padding: 20px;
+  border-left: 5px solid #1976d2;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  &.alert-info {
+    border-left-color: #1976d2;
+    background: linear-gradient(135deg, #f5f9ff 0%, #fff 100%);
+  }
+
+  &.alert-warning {
+    border-left-color: #ffa000;
+    background: linear-gradient(135deg, #fff8f5 0%, #fff 100%);
+  }
+
+  &.alert-error {
+    border-left-color: #f44336;
+    background: linear-gradient(135deg, #ffebee 0%, #fff 100%);
+  }
+
+  &.alert-success {
+    border-left-color: #4caf50;
+    background: linear-gradient(135deg, #f1f8f5 0%, #fff 100%);
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.description {
+  margin: 8px 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.valor-principal {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 15px 0;
+
+  .numero {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1976d2;
+  }
+
+  .unidad {
+    font-size: 12px;
+    color: #999;
+    text-transform: uppercase;
+  }
+}
+
+.recomendacion {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  background-color: rgba(255, 193, 7, 0.1);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #ffa000;
+  margin-top: 10px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+  }
+}
+
+.datos-adicionales {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+
+    .key {
+      color: #999;
+      font-weight: 500;
+    }
+
+    .value {
+      color: #333;
+      font-weight: 600;
+    }
+  }
+}
+
+// Section Cards
+.section-card {
+  margin-top: 15px;
+  border-top: 4px solid #1976d2;
+
+  mat-card-header {
+    margin-bottom: 20px;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      margin: 0;
+
+      mat-icon {
+        color: #1976d2;
+      }
+    }
+  }
+}
+
+// Tabla de predicciones
+.predicciones-table {
+  width: 100%;
+  margin-top: 15px;
+
+  th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    color: #333;
+  }
+
+  td {
+    padding: 12px;
+  }
+
+  tr:hover {
+    background-color: #f9f9f9;
+  }
+}
+
+// Warning box
+.warning-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background-color: #e3f2fd;
+  border-left: 4px solid #1976d2;
+  border-radius: 4px;
+  color: #0d47a1;
+  font-size: 13px;
+  margin-bottom: 15px;
+
+  mat-icon {
+    color: #1976d2;
+  }
+}
+
+// Anomalías
+.anomalias-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .label {
+      font-size: 12px;
+      color: #999;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+
+      &.danger {
+        color: #f44336;
+      }
+
+      &.success {
+        color: #4caf50;
+      }
+    }
+  }
+}
+
+.anomalias-list {
+  margin-top: 15px;
+
+  h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 14px;
+  }
+}
+
+.anomalia-item {
+  position: relative;
+  padding: 10px;
+  margin: 8px 0;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  overflow: hidden;
+
+  .severity {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #ff9800;
+    opacity: 0.2;
+    transition: width 0.3s ease;
+  }
+
+  .info {
+    position: relative;
+    font-size: 12px;
+    color: #666;
+    display: block;
+  }
+}
+
+.success-message {
+  padding: 12px;
+  background-color: #c8e6c9;
+  color: #2e7d32;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+// Inventario
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.inventory-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+
+  .label {
+    font-size: 12px;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1976d2;
+  }
+
+  .unit {
+    font-size: 11px;
+    color: #ccc;
+    margin-top: 4px;
+  }
+}
+
+.recomendacion-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  background-color: #e8f5e9;
+  border-left: 4px solid #4caf50;
+  border-radius: 4px;
+  color: #1b5e20;
+  font-size: 13px;
+
+  mat-icon {
+    color: #4caf50;
+    margin-top: 2px;
+  }
+}
+
+.meta-info {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #999;
+  text-align: right;
+}
+
+// Timestamp
+.timestamp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 10px;
+  font-size: 12px;
+  color: #999;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 20px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .insights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .insight-card .valor-principal .numero {
+    font-size: 24px;
+  }
+
+  .anomalias-summary,
+  .inventory-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .ia-insights-container {
+    padding: 10px;
+    gap: 15px;
+  }
+
+  .insights-header h2 {
+    font-size: 18px;
+  }
+
+  .anomalias-summary,
+  .inventory-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .predicciones-table {
+    font-size: 12px;
+
+    td {
+      padding: 8px;
+    }
+  }
+}

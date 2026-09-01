@@ -1,0 +1,154 @@
+<h2 mat-dialog-title class="dialog-title">
+  <span class="icon">📋</span>
+  {{ isEdit ? '✏️ Editar Remisión' : '➕ Nueva Remisión' }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="remision-form">
+    <!-- Sección 1: Datos de la Remisión -->
+    <div class="form-section">
+      <h3 class="section-title">Información de Remisión</h3>
+      <div class="form-grid">
+        <mat-form-field class="form-field-lg">
+          <mat-label>Número de Remisión</mat-label>
+          <input matInput formControlName="numero_remision" required placeholder="REM-001" type="text">
+          <mat-icon matPrefix>confirmation_number</mat-icon>
+          <mat-hint>Identificador único de la remisión</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="form-grid">
+        <mat-form-field>
+          <mat-label>Lote</mat-label>
+          <mat-select formControlName="lote_id" required>
+            <mat-option *ngIf="lotes.length === 0" disabled>No hay lotes disponibles</mat-option>
+            <mat-option *ngFor="let lote of lotes" [value]="lote.id">
+              📦 {{ lote.numero_lote }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>inventory</mat-icon>
+          <mat-hint *ngIf="lotes.length === 0">Crea lotes antes de crear remisiones</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Taller Destino</mat-label>
+          <mat-select formControlName="taller_id" required>
+            <mat-option *ngFor="let taller of talleres" [value]="taller.id">
+              🏭 {{ taller.codigo }} - {{ taller.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>business</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-grid">
+        <mat-form-field>
+          <mat-label>Fecha de Remisión</mat-label>
+          <input matInput [matDatepicker]="pickerRemision" formControlName="fecha_remision" required>
+          <mat-datepicker-toggle matSuffix [for]="pickerRemision"></mat-datepicker-toggle>
+          <mat-icon matPrefix>event</mat-icon>
+          <mat-datepicker #pickerRemision></mat-datepicker>
+          <mat-hint>Fecha de envío</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Fecha Entrega Estimada</mat-label>
+          <input matInput [matDatepicker]="pickerEntrega" formControlName="fecha_entrega_estimada">
+          <mat-datepicker-toggle matSuffix [for]="pickerEntrega"></mat-datepicker-toggle>
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          <mat-datepicker #pickerEntrega></mat-datepicker>
+          <mat-hint>Fecha estimada de llegada</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field class="form-field-full">
+        <mat-label>Observaciones</mat-label>
+        <textarea matInput formControlName="observaciones" rows="2" placeholder="Notas adicionales sobre la remisión..."></textarea>
+        <mat-icon matPrefix>notes</mat-icon>
+        <mat-hint>Notas o instrucciones especiales</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <!-- Sección 2: Detalles de Asignación -->
+    <div class="form-section">
+      <div class="section-header">
+        <h3 class="section-title">Asignación de Prendas por Talla</h3>
+        <p class="section-hint">Configure los detalles de confección para cada talla</p>
+      </div>
+
+      <div class="detalles-container">
+        <div formArrayName="detalles">
+          <div *ngFor="let detalle of detalles.controls; let i = index" [formGroupName]="i" class="detalle-card">
+            <div class="detalle-header-card">
+              <h4 class="detalle-number">
+                <span class="badge-number">{{ i + 1 }}</span>
+                Asignación de Talla
+              </h4>
+              <button mat-icon-button type="button" (click)="eliminarDetalle(i)" *ngIf="detalles.length > 1" 
+                      color="warn" class="btn-delete" matTooltip="Eliminar asignación">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+
+            <div class="detalle-grid">
+              <mat-form-field>
+                <mat-label>Talla</mat-label>
+                <mat-select formControlName="talla_id" required>
+                  <mat-option *ngFor="let talla of tallas" [value]="talla.id">
+                    📏 {{ talla.codigo }} - {{ talla.nombre }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matPrefix>straighten</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field>
+                <mat-label>Cantidad Asignada</mat-label>
+                <input matInput type="number" formControlName="cantidad" required min="1" placeholder="0">
+                <mat-icon matPrefix>shopping_cart</mat-icon>
+                <mat-hint>Prendas para confeccionar</mat-hint>
+              </mat-form-field>
+            </div>
+
+            <div class="detalle-grid">
+              <mat-form-field>
+                <mat-label>Confeccionista</mat-label>
+                <input matInput formControlName="confeccionista_nombre" placeholder="Nombre completo">
+                <mat-icon matPrefix>person</mat-icon>
+                <mat-hint>Persona responsable</mat-hint>
+              </mat-form-field>
+
+              <mat-form-field>
+                <mat-label>Tipo de Prenda</mat-label>
+                <input matInput formControlName="tipo_prenda" placeholder="Camiseta, Pantalón, etc.">
+                <mat-icon matPrefix>checkroom</mat-icon>
+                <mat-hint>Clasificación de la prenda</mat-hint>
+              </mat-form-field>
+            </div>
+
+            <div class="detalle-grid">
+              <mat-form-field class="form-field-full">
+                <mat-label>Fecha Estimada de Entrega</mat-label>
+                <input matInput type="date" formControlName="fecha_entrega_estimada">
+                <mat-icon matPrefix>date_range</mat-icon>
+                <mat-hint>Cuándo se espera completar</mat-hint>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <button mat-stroked-button type="button" (click)="agregarDetalle()" class="btn-add-detalle">
+          <mat-icon>add_circle</mat-icon>
+          Agregar otra Talla
+        </button>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="guardar()" [disabled]="!form.valid">
+    <mat-icon>{{ isEdit ? 'check_circle' : 'add_task' }}</mat-icon>
+    {{ isEdit ? 'Actualizar' : 'Crear Remisión' }}
+  </button>
+</mat-dialog-actions>

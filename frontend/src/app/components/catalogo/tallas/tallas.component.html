@@ -1,0 +1,58 @@
+<div class="tallas-container">
+  <div class="header-actions">
+    <h2>
+      <mat-icon>straighten</mat-icon>
+      Tallas
+    </h2>
+    <button mat-raised-button color="primary" (click)="nuevaTalla()">
+      <mat-icon>add</mat-icon>
+      Nueva Talla
+    </button>
+  </div>
+
+  <mat-card *ngIf="loading">
+    <mat-card-content>
+      <mat-spinner></mat-spinner>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="!loading">
+    <mat-card-content>
+      <table mat-table [dataSource]="tallas" class="mat-elevation-z2">
+        <ng-container matColumnDef="codigo">
+          <th mat-header-cell *matHeaderCellDef>Código</th>
+          <td mat-cell *matCellDef="let talla">{{ talla.codigo }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
+          <td mat-cell *matCellDef="let talla">{{ talla.nombre }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="activo">
+          <th mat-header-cell *matHeaderCellDef>Activo</th>
+          <td mat-cell *matCellDef="let talla">
+            <mat-chip [color]="talla.activo ? 'primary' : 'warn'">
+              {{ talla.activo ? 'Sí' : 'No' }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let talla">
+            <button mat-icon-button class="action-button" matTooltip="Editar" aria-label="Editar talla" (click)="editarTalla(talla)">
+              <mat-icon color="primary">edit</mat-icon>
+            </button>
+            <button mat-icon-button class="action-button" matTooltip="Eliminar" aria-label="Eliminar talla" (click)="eliminarTalla(talla)">
+              <mat-icon color="warn">delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

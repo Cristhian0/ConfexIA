@@ -1,0 +1,316 @@
+<div class="produccion-container">
+  <div class="header">
+    <h1>Módulo 4: Confección (Producción)</h1>
+    <p class="subtitle">RF-11 a RF-14: Órdenes de confección, operaciones, tiempos y control</p>
+  </div>
+
+  <!-- Sección de Creación de Órdenes -->
+  <mat-card class="section-card">
+    <mat-card-title>RF-11: Generar Orden de Confección</mat-card-title>
+    <mat-card-content>
+      <form [formGroup]="formNuevaOrden" class="form-container">
+        <mat-form-field appearance="outline" class="form-field-half">
+          <mat-label>Lote Asociado</mat-label>
+          <mat-select formControlName="lote_id" required>
+            <mat-option *ngFor="let lote of lotesDisponibles" [value]="lote.id">
+              {{ lote.numero_lote }} - {{ lote.referencia_nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field-half">
+          <mat-label>Observaciones (Opcional)</mat-label>
+          <textarea matInput formControlName="observaciones" rows="3"></textarea>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="crearOrdenProduccion()" [disabled]="formNuevaOrden.invalid">
+          <mat-icon>add_circle</mat-icon>
+          Crear Orden
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tabla de Órdenes -->
+  <mat-card class="section-card">
+    <mat-card-title>Órdenes de Producción</mat-card-title>
+    <mat-card-content>
+      <mat-spinner *ngIf="loading" class="loading-spinner"></mat-spinner>
+
+      <table mat-table [dataSource]="ordenesProduccion" class="mat-elevation-z2" *ngIf="!loading && ordenesProduccion.length">
+        <ng-container matColumnDef="numero_orden">
+          <th mat-header-cell *matHeaderCellDef>Orden</th>
+          <td mat-cell *matCellDef="let orden" class="link-cell" (click)="seleccionarOrden(orden)">
+            {{ orden.numero_orden }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="numero_lote">
+          <th mat-header-cell *matHeaderCellDef>Lote</th>
+          <td mat-cell *matCellDef="let orden">{{ getNombreLote(orden.lote_id) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="referencia">
+          <th mat-header-cell *matHeaderCellDef>Referencia</th>
+          <td mat-cell *matCellDef="let orden">{{ getReferencia(orden.lote_id) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let orden">
+            <mat-chip [class.pending]="orden.estado === 'pendiente'"
+                      [class.in-progress]="orden.estado === 'en_progreso'"
+                      [class.completed]="orden.estado === 'completada'"
+                      [class.cancelled]="orden.estado === 'cancelada'">
+              {{ getEstadoLabel(orden.estado) }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="fecha_creacion">
+          <th mat-header-cell *matHeaderCellDef>Creación</th>
+          <td mat-cell *matCellDef="let orden">{{ orden.fecha_creacion | date:'short' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fecha_fin">
+          <th mat-header-cell *matHeaderCellDef>Fin</th>
+          <td mat-cell *matCellDef="let orden">{{ orden.fecha_fin ? (orden.fecha_fin | date:'short') : '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="registros">
+          <th mat-header-cell *matHeaderCellDef>Registros</th>
+          <td mat-cell *matCellDef="let orden">{{ getCantidadRegistros(orden) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let orden">
+            <button mat-icon-button (click)="seleccionarOrden(orden)" matTooltip="Ver detalles">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button (click)="completarOrden(orden)" 
+                    *ngIf="orden.estado !== 'completada' && orden.estado !== 'cancelada'"
+                    matTooltip="Completar orden">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <p *ngIf="!loading && !ordenesProduccion.length" class="no-data">No hay órdenes aún</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Detalles de Orden Seleccionada y Registro de Producción -->
+  <mat-card class="section-card" *ngIf="ordenSeleccionada">
+    <mat-card-title>
+      Detalles - Orden {{ ordenSeleccionada.numero_orden }}
+    </mat-card-title>
+    <mat-card-content>
+      <!-- Información de la Orden -->
+      <div class="order-info">
+        <div class="info-group">
+          <label>Lote:</label>
+          <span>{{ getNombreLote(ordenSeleccionada.lote_id) }}</span>
+        </div>
+        <div class="info-group">
+          <label>Estado:</label>
+          <mat-chip [class.pending]="ordenSeleccionada.estado === 'pendiente'"
+                    [class.in-progress]="ordenSeleccionada.estado === 'en_progreso'"
+                    [class.completed]="ordenSeleccionada.estado === 'completada'">
+            {{ getEstadoLabel(ordenSeleccionada.estado) }}
+          </mat-chip>
+        </div>
+        <div class="info-group">
+          <label>Total Producido:</label>
+          <span>{{ getTotalProducido(registrosSeleccionados) }} piezas</span>
+        </div>
+        <div class="info-group">
+          <label>Total Rechazado:</label>
+          <span>{{ getTotalRechazado(registrosSeleccionados) }} piezas</span>
+        </div>
+        <div class="info-group">
+          <label>Tiempo Total:</label>
+          <span>{{ getTiempoTotal(registrosSeleccionados) }}</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+      <h3>Control de Calidad</h3>
+      <form [formGroup]="formCalidadOrden" class="form-container quality-form">
+        <div class="form-row">
+          <div class="field-group">
+            <label>Fecha recepción</label>
+            <input type="date" formControlName="fecha_recepcion" class="custom-input">
+          </div>
+
+          <div class="field-group">
+            <label>Revisa</label>
+            <input type="text" formControlName="revisado_por" class="custom-input" placeholder="Persona que revisa">
+          </div>
+
+          <div class="field-group">
+            <label>Parcial</label>
+            <input type="number" min="0" formControlName="cantidad_parcial" class="custom-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field-group">
+            <label>Arreglos</label>
+            <input type="number" min="0" formControlName="cantidad_arreglos" class="custom-input">
+          </div>
+
+          <div class="field-group">
+            <label>Imperfecta</label>
+            <input type="number" min="0" formControlName="cantidad_imperfecciones" class="custom-input">
+          </div>
+
+          <div class="field-group">
+            <label>Pendientes</label>
+            <input type="number" min="0" formControlName="cantidad_pendiente" class="custom-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field-group checkbox-wrap">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="requiere_compras">
+              <span>Requiere compras</span>
+            </label>
+          </div>
+
+          <div class="field-group">
+            <label>Entrega total</label>
+            <input type="date" formControlName="fecha_entrega_total" class="custom-input">
+          </div>
+
+          <div class="field-group">
+            <label>Días de Mora</label>
+            <input type="number" min="0" formControlName="dias_mora" class="custom-input">
+          </div>
+        </div>
+
+        <div class="form-row single-row">
+          <div class="field-group field-group-wide">
+            <label>Estado de pago</label>
+            <select formControlName="estado_pago" class="custom-input select-input">
+              <option value="">Selecciona estado</option>
+              <option *ngFor="let estado of estadoPagoOptions" [value]="estado">{{ estado }}</option>
+            </select>
+          </div>
+        </div>
+      </form>
+
+      <!-- Formulario de Registro RF-12, RF-13, RF-14 -->
+      <mat-divider></mat-divider>
+      <h3>RF-12-14: Registrar Producción por Operación</h3>
+      <form [formGroup]="formRegistroProduccion" class="form-container production-form">
+        <div class="form-row">
+          <div class="field-group">
+            <label>Operación</label>
+            <select formControlName="operacion" class="custom-input select-input" required>
+              <option value="">Selecciona</option>
+              <option [value]="'ensamble'">{{ getOperacionLabel('ensamble') }}</option>
+              <option [value]="'costura'">{{ getOperacionLabel('costura') }}</option>
+              <option [value]="'fileteado'">{{ getOperacionLabel('fileteado') }}</option>
+              <option [value]="'terminacion'">{{ getOperacionLabel('terminacion') }}</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Operario</label>
+            <input type="text" formControlName="operario" class="custom-input" placeholder="Nombre del operario" required>
+          </div>
+
+          <div class="field-group">
+            <label>Línea Producción</label>
+            <input type="text" formControlName="linea_produccion" class="custom-input" placeholder="Ej: A1, A2, B1">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field-group">
+            <label>Cantidad Producida</label>
+            <input type="number" formControlName="cantidad_producida" min="0" class="custom-input" required>
+          </div>
+
+          <div class="field-group">
+            <label>Cantidad Rechazada</label>
+            <input type="number" formControlName="cantidad_rechazada" min="0" class="custom-input">
+          </div>
+
+          <div class="field-group">
+            <label>Hora Inicio</label>
+            <input type="datetime-local" formControlName="tiempo_inicio" class="custom-input" required>
+          </div>
+        </div>
+
+        <div class="form-row compact-row">
+          <div class="field-group field-group-wide">
+            <label>Hora Fin (Opcional)</label>
+            <input type="datetime-local" formControlName="tiempo_fin" class="custom-input">
+          </div>
+
+          <div class="field-group field-group-wide">
+            <label>Notas</label>
+            <textarea formControlName="notas" rows="2" class="custom-input textarea-input"></textarea>
+          </div>
+        </div>
+
+        <button mat-raised-button color="accent" (click)="registrarProduccion()" [disabled]="formRegistroProduccion.invalid">
+          <mat-icon>add</mat-icon>
+          Registrar Producción
+        </button>
+      </form>
+
+      <!-- Tabla de Registros -->
+      <mat-divider class="divider-margin"></mat-divider>
+      <h3>Registros de Operaciones</h3>
+      <table mat-table [dataSource]="registrosSeleccionados" class="mat-elevation-z2" *ngIf="registrosSeleccionados.length">
+        <ng-container matColumnDef="operacion">
+          <th mat-header-cell *matHeaderCellDef>Operación</th>
+          <td mat-cell *matCellDef="let registro">{{ getOperacionLabel(registro.operacion) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="operario">
+          <th mat-header-cell *matHeaderCellDef>Operario</th>
+          <td mat-cell *matCellDef="let registro">{{ registro.operario }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="linea">
+          <th mat-header-cell *matHeaderCellDef>Línea</th>
+          <td mat-cell *matCellDef="let registro">{{ registro.linea_produccion || '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="cantidad">
+          <th mat-header-cell *matHeaderCellDef>Producidas</th>
+          <td mat-cell *matCellDef="let registro">{{ registro.cantidad_producida }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="rechazadas">
+          <th mat-header-cell *matHeaderCellDef>Rechazadas</th>
+          <td mat-cell *matCellDef="let registro">{{ registro.cantidad_rechazada }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="tiempo">
+          <th mat-header-cell *matHeaderCellDef>Tiempo (min)</th>
+          <td mat-cell *matCellDef="let registro">{{ registro.tiempo_total_minutos || '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="inicio">
+          <th mat-header-cell *matHeaderCellDef>Inicio</th>
+          <td mat-cell *matCellDef="let registro">{{ registro.tiempo_inicio | date:'short' }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['operacion', 'operario', 'linea', 'cantidad', 'rechazadas', 'tiempo', 'inicio']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['operacion', 'operario', 'linea', 'cantidad', 'rechazadas', 'tiempo', 'inicio'];"></tr>
+      </table>
+
+      <p *ngIf="!registrosSeleccionados.length" class="no-data">Sin registros aún</p>
+    </mat-card-content>
+  </mat-card>
+</div>

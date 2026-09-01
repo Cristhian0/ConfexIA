@@ -1,0 +1,211 @@
+<div class="ia-insights-container">
+  <!-- Encabezado -->
+  <div class="insights-header">
+    <h2>
+      <mat-icon>smart_toy</mat-icon>
+      Análisis Inteligente - IA & Predicciones
+    </h2>
+    <button mat-icon-button (click)="cargarInsights()" [disabled]="cargando">
+      <mat-icon [class.spin]="cargando">refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Analizando datos...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !cargando" class="error-message">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Contenido principal -->
+  <div *ngIf="!cargando && !error && analisis" class="insights-content">
+    
+    <!-- Grid de Insights -->
+    <div class="insights-grid">
+      <ng-container *ngFor="let insight of insights">
+        <mat-card 
+          class="insight-card" 
+          [ngClass]="'alert-' + insight.tipo_alerta"
+        >
+          <!-- Encabezado del card -->
+          <div class="card-header">
+            <mat-icon [color]="getColorAlerta(insight.tipo_alerta)">
+              {{ getIconoAlerta(insight.tipo_alerta) }}
+            </mat-icon>
+            <h3>{{ insight.titulo }}</h3>
+          </div>
+
+          <!-- Descripción -->
+          <p class="description">{{ insight.descripcion }}</p>
+
+          <!-- Valor principal -->
+          <div class="valor-principal">
+            <span class="numero">{{ formatearValor(insight.valor_principal, insight.unidad) }}</span>
+            <span class="unidad">{{ insight.unidad }}</span>
+          </div>
+
+          <!-- Recomendación -->
+          <div *ngIf="insight.recomendacion" class="recomendacion">
+            <mat-icon>lightbulb_outline</mat-icon>
+            <span>{{ insight.recomendacion }}</span>
+          </div>
+
+          <!-- Datos adicionales -->
+          <div *ngIf="insight.datos_adicionales" class="datos-adicionales">
+            <div *ngFor="let key of insight.datos_adicionales | keyvalue">
+              <span class="key">{{ key.key }}:</span>
+              <span class="value">{{ key.value }}</span>
+            </div>
+          </div>
+        </mat-card>
+      </ng-container>
+    </div>
+
+    <!-- Sección: Predicción de Demanda -->
+    <mat-card *ngIf="analisis.predicciones_demanda" class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>trending_up</mat-icon>
+          Predicción de Demanda
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="!analisis.predicciones_demanda.modelo_entrenado" class="warning-box">
+          <mat-icon>info</mat-icon>
+          <span>Modelo en desarrollo - se necesitan más datos históricos</span>
+        </div>
+        
+        <table mat-table [dataSource]="analisis.predicciones_demanda.predicciones" class="predicciones-table">
+          
+          <!-- Columna: Fecha -->
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.fecha | date: 'dd/MM/yyyy' }}
+            </td>
+          </ng-container>
+
+          <!-- Columna: Cantidad Predicha -->
+          <ng-container matColumnDef="cantidad">
+            <th mat-header-cell *matHeaderCellDef>Cantidad Predicha</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.cantidad_predicha | number: '1.0-0' }}
+            </td>
+          </ng-container>
+
+          <!-- Columna: Confianza -->
+          <ng-container matColumnDef="confianza">
+            <th mat-header-cell *matHeaderCellDef>Confianza</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-progress-bar 
+                mode="determinate" 
+                [value]="element.confianza * 100"
+                [color]="element.confianza > 0.8 ? 'accent' : 'primary'"
+              ></mat-progress-bar>
+              {{ (element.confianza * 100) | number: '1.0-0' }}%
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['fecha', 'cantidad', 'confianza']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['fecha', 'cantidad', 'confianza'];"></tr>
+        </table>
+
+        <p class="meta-info">
+          📊 Datos históricos: {{ analisis.predicciones_demanda.dias_historicos }} días
+        </p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Sección: Anomalías Detectadas -->
+    <mat-card *ngIf="analisis.anomalias_calidad" class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>bug_report</mat-icon>
+          Análisis de Anomalías - Control de Calidad
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="anomalias-summary">
+          <div class="stat">
+            <span class="label">Anomalías Detectadas</span>
+            <span class="value" [class.danger]="analisis.anomalias_calidad.anomalias_detectadas > 0">
+              {{ analisis.anomalias_calidad.anomalias_detectadas }}
+            </span>
+          </div>
+          <div class="stat">
+            <span class="label">Registros Analizados</span>
+            <span class="value">{{ analisis.anomalias_calidad.registros_analizados }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Modelo</span>
+            <span class="value" [class.success]="analisis.anomalias_calidad.modelo_entrenado">
+              {{ analisis.anomalias_calidad.modelo_entrenado ? '✓ Entrenado' : '○ Sin entrenar' }}
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="analisis.anomalias_calidad.anomalias.length > 0" class="anomalias-list">
+          <h4>Anomalías Encontradas:</h4>
+          <div *ngFor="let anomalia of analisis.anomalias_calidad.anomalias" class="anomalia-item">
+            <span class="severity" [style.width]="(anomalia.severidad * 100) + '%'"></span>
+            <span class="info">
+              Índice: {{ anomalia.indice }} | Severidad: {{ (anomalia.severidad * 100) | number: '1.0-0' }}%
+            </span>
+          </div>
+        </div>
+        <p *ngIf="analisis.anomalias_calidad.anomalias.length === 0" class="success-message">
+          ✓ No se detectaron anomalías en los datos recientes
+        </p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Sección: Recomendaciones de Inventario -->
+    <mat-card *ngIf="analisis.recomendaciones_inventario" class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>storage</mat-icon>
+          Recomendaciones de Inventario
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="inventory-grid">
+          <div class="inventory-item">
+            <span class="label">Punto de Reorden</span>
+            <span class="value">{{ analisis.recomendaciones_inventario.punto_reorden | number: '1.0-0' }}</span>
+            <span class="unit">unidades</span>
+          </div>
+          <div class="inventory-item">
+            <span class="label">Stock Mínimo</span>
+            <span class="value">{{ analisis.recomendaciones_inventario.stock_minimo | number: '1.0-0' }}</span>
+            <span class="unit">unidades</span>
+          </div>
+          <div class="inventory-item">
+            <span class="label">Stock de Seguridad</span>
+            <span class="value">{{ analisis.recomendaciones_inventario.stock_seguridad | number: '1.0-0' }}</span>
+            <span class="unit">unidades</span>
+          </div>
+          <div class="inventory-item">
+            <span class="label">Lead Time</span>
+            <span class="value">{{ analisis.recomendaciones_inventario.lead_time_dias }}</span>
+            <span class="unit">días</span>
+          </div>
+        </div>
+        <div class="recomendacion-box">
+          <mat-icon>info</mat-icon>
+          <span>{{ analisis.recomendaciones_inventario.recomendacion }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Timestamp -->
+    <div class="timestamp">
+      <mat-icon>schedule</mat-icon>
+      Análisis actualizado: {{ analisis.fecha_analisis | date: 'dd/MM/yyyy HH:mm' }}
+    </div>
+  </div>
+</div>

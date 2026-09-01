@@ -1,0 +1,17 @@
+<div class="signature-dialog">
+  <canvas #canvas
+    (mousedown)="startDraw($event)"
+    (mousemove)="moveDraw($event)"
+    (mouseup)="endDraw()"
+    (mouseleave)="endDraw()"
+    (touchstart)="startDraw($event)"
+    (touchmove)="moveDraw($event)"
+    (touchend)="endDraw()"></canvas>
+
+  <div class="actions">
+    <button mat-button color="primary" (click)="clear()">Borrar</button>
+    <span class="spacer"></span>
+    <button mat-button (click)="cancel()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="save()">Guardar</button>
+  </div>
+</div>

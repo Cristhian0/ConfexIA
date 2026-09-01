@@ -1,0 +1,65 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+  background: #ffffff;
+  position: relative;
+}
+
+.login-container::before{
+	content: '';
+	position: absolute;
+	inset:0;
+	background-image: repeating-linear-gradient(45deg, rgba(5,40,30,0.02) 0 2px, transparent 2px 22px);
+	opacity:0.18;
+	pointer-events:none;
+}
+
+.login-card {
+  width: 520px;
+  padding: 28px 30px;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(2,6,23,0.08);
+  background: #ffffff;
+  border: 1px solid rgba(10,30,60,0.06);
+  backdrop-filter: blur(6px);
+
+}
+
+.login-form { display:flex; flex-direction:column; gap:14px; margin-top:12px }
+.full { width: 100%; }
+.error { color: #b00020; margin-bottom: 10px }
+.login-btn { padding: 14px 18px; background: linear-gradient(90deg,#0b3d82,#2557d9); color:#fff; font-weight:700; border:none; border-radius:8px; box-shadow: 0 10px 30px rgba(37,87,217,0.12); }
+.login-btn:hover { transform: translateY(-2px); }
+
+.back-link{ color:#2b6cb0; font-size:14px; margin-bottom:10px }
+.login-title{ margin:0; font-size:32px; font-weight:800; color:#102a43 }
+.login-sub{ margin:6px 0 12px 0; color:#556; }
+
+.demo-credentials{ margin-top:16px; border:1px solid rgba(10,30,60,0.06); padding:12px; border-radius:8px; background:#fbfdff }
+.demo-credentials .cred-title{ font-weight:700; margin-bottom:8px }
+.cred-item{ display:flex; gap:8px; align-items:center; color:#334155 }
+.cred-item mat-icon{ font-size:18px; color:#0b6b58 }
+
+.mat-form-field-appearance-outline .mat-form-field-outline { border-color: rgba(10,80,120,0.06); }
+.mat-form-field-appearance-outline .mat-form-field-outline-thick { border-color: rgba(37,87,217,0.12); }
+.mat-form-field .mat-input-element { padding: 14px 10px; }
+.mat-form-field.mat-focused .mat-form-field-outline-thick { box-shadow: 0 6px 18px rgba(37,87,217,0.06); }
+.mat-form-field.mat-focused .mat-form-field-label { color: #1e40af !important; }
+
+
+/* subtle stitch accent under card */
+.login-card::after{
+	content: '';
+	display:block;
+	height:6px;
+	margin-top:16px;
+	background-image: linear-gradient(90deg, transparent 0 8px, rgba(37,87,217,0.12) 8px 10px);
+	border-radius:4px;
+}
+
+@media (max-width:480px){
+	.login-card{ width:100%; border-radius:0; }
+}

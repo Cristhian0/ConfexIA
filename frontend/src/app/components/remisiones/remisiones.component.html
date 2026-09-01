@@ -1,0 +1,103 @@
+<div class="remisiones-container">
+  <div class="header">
+    <h1>Gestión de Remisiones</h1>
+    <button mat-raised-button color="primary" (click)="abrirFormulario()">
+      <mat-icon>add</mat-icon>
+      Nueva Remisión
+    </button>
+  </div>
+
+  <mat-card *ngIf="remisiones.length === 0 && !loading" class="empty-state">
+    <mat-card-content>
+      <p>No hay remisiones registradas</p>
+      <button mat-button color="primary" (click)="abrirFormulario()">Crear primera remisión</button>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando remisiones...</p>
+  </div>
+
+  <div *ngIf="remisiones.length > 0" class="remisiones-table">
+    <table mat-table [dataSource]="remisiones" class="mat-elevation-z2">
+      <!-- Columna Número Remisión -->
+      <ng-container matColumnDef="numero_remision">
+        <th mat-header-cell *matHeaderCellDef>Número Remisión</th>
+        <td mat-cell *matCellDef="let remision">{{ remision.numero_remision }}</td>
+      </ng-container>
+
+      <!-- Columna Taller -->
+      <ng-container matColumnDef="taller">
+        <th mat-header-cell *matHeaderCellDef>Taller</th>
+        <td mat-cell *matCellDef="let remision">
+          <span *ngIf="remision.taller">{{ remision.taller.nombre }}</span>
+          <span *ngIf="!remision.taller">-</span>
+        </td>
+      </ng-container>
+
+      <!-- Columna Lote -->
+      <ng-container matColumnDef="lote">
+        <th mat-header-cell *matHeaderCellDef>Lote</th>
+        <td mat-cell *matCellDef="let remision">
+          <span *ngIf="remision.lote">{{ remision.lote.numero_lote }}</span>
+          <span *ngIf="!remision.lote">-</span>
+        </td>
+      </ng-container>
+
+      <!-- Columna Detalles -->
+      <ng-container matColumnDef="detalles">
+        <th mat-header-cell *matHeaderCellDef>Asignaciones</th>
+        <td mat-cell *matCellDef="let remision">
+          <div class="detalles-summary">
+            <span *ngFor="let detalle of remision.detalles; let last = last" class="detalle-badge">
+              <strong>{{ getTallaNombre(detalle) }}:</strong> {{ detalle.cantidad }}
+              <span *ngIf="detalle.confeccionista_nombre" class="confeccionista">({{ detalle.confeccionista_nombre }})</span>
+              <span *ngIf="!last">, </span>
+            </span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Columna Estado -->
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let remision">
+          <mat-chip [ngClass]="'estado-' + remision.estado">
+            {{ getEstadoLabel(remision.estado) }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <!-- Columna Fechas -->
+      <ng-container matColumnDef="fechas">
+        <th mat-header-cell *matHeaderCellDef>Fechas</th>
+        <td mat-cell *matCellDef="let remision">
+          <div class="fechas-info">
+            <div><strong>Remisión:</strong> {{ formatDate(remision.fecha_remision) }}</div>
+            <div *ngIf="remision.fecha_entrega_estimada">
+              <strong>Entrega Estimada:</strong> {{ formatDate(remision.fecha_entrega_estimada) }}
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Columna Acciones -->
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let remision">
+          <button mat-icon-button (click)="verDetalles(remision)" matTooltip="Ver detalles">
+            <mat-icon>visibility</mat-icon>
+          </button>
+          <button mat-icon-button (click)="editar(remision)" matTooltip="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+    </table>
+  </div>
+</div>
+

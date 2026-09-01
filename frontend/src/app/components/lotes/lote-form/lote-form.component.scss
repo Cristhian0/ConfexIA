@@ -1,0 +1,68 @@
+.lote-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 600px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-row mat-form-field {
+  flex: 1 1 220px;
+}
+
+.small-field {
+  flex: 0 0 160px;
+}
+
+.detalles-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.detalle-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.hint-text {
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 16px;
+}
+
+.resumen-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.resumen-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.resumen-table th,
+.resumen-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.resumen-table th {
+  background-color: #f5f5f5;
+  font-weight: 500;
+}
+

@@ -1,0 +1,213 @@
+.corte-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30%),
+    linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  border-radius: 24px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+.page-head {
+  margin-bottom: 24px;
+
+  h1 {
+    color: #0f172a;
+    margin-bottom: 8px;
+    font-size: 2rem;
+    font-weight: 800;
+  }
+}
+
+.muted {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.modern-tabs {
+  margin-top: 8px;
+}
+
+.modern-tabs ::ng-deep .mat-mdc-tab-header {
+  background: linear-gradient(135deg, #e0ecff 0%, #f8fbff 100%);
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  border-radius: 18px;
+  padding: 4px;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.10);
+}
+
+.modern-tabs ::ng-deep .mat-mdc-tab {
+  min-height: 48px;
+  border-radius: 14px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.modern-tabs ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+  color: #334155;
+}
+
+.modern-tabs ::ng-deep .mat-mdc-tab.mdc-tab--active {
+  background: linear-gradient(135deg, #003d82 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 61, 130, 0.24);
+}
+
+.modern-tabs ::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: #ffffff;
+}
+
+.form-card,
+.table-card {
+  margin-bottom: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 248, 255, 0.98) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  border-radius: 20px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.section-kicker {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.10);
+  color: #1d4ed8;
+  margin: 16px 16px 0;
+}
+
+.mat-mdc-card-header {
+  padding: 12px 16px 0;
+}
+
+.mat-mdc-card-content {
+  padding: 16px;
+}
+
+.mat-mdc-card-actions {
+  padding: 0 16px 16px;
+}
+
+.full {
+  width: 100%;
+}
+
+.lineas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.linea {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.merma-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin: 12px 0;
+}
+
+.merma-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.merma-table th,
+.merma-table td {
+  border: 1px solid #e2e8f0;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.merma-table th {
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.mat-mdc-table {
+  background: transparent;
+}
+
+.mat-mdc-header-row {
+  background: linear-gradient(135deg, #003d82 0%, #2563eb 100%);
+}
+
+.mat-mdc-header-cell {
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+.mat-mdc-row:nth-child(even) {
+  background: #f8fbff;
+}
+
+.mat-mdc-row:nth-child(odd) {
+  background: #ffffff;
+}
+
+.mat-mdc-cell {
+  border-bottom: 1px solid rgba(37, 99, 235, 0.10);
+}
+
+.merma-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.merma-table th {
+  background: linear-gradient(135deg, #003d82 0%, #2563eb 100%);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.merma-table th,
+.merma-table td {
+  border: 1px solid rgba(37, 99, 235, 0.10);
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.merma-table tbody tr:nth-child(even) {
+  background: #f8fbff;
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 400px;
+  padding: 16px 0;
+
+  .full-width {
+    width: 100%;
+  }
+}

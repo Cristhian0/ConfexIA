@@ -1,0 +1,30 @@
+<div class="catalogo-container">
+  <div class="header-section">
+    <h1 class="title">Catálogo de Productos</h1>
+    <p class="subtitle">Gestiona tallas, colores, materiales y referencias de tu colección textil</p>
+  </div>
+
+  <mat-tab-group class="tabs-modern" [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
+    <mat-tab label="Tallas">
+      <div class="tab-content">
+        <app-tallas></app-tallas>
+      </div>
+    </mat-tab>
+    <mat-tab label="Colores">
+      <div class="tab-content">
+        <app-colores></app-colores>
+      </div>
+    </mat-tab>
+    <mat-tab label="Materiales">
+      <div class="tab-content">
+        <app-materiales></app-materiales>
+      </div>
+    </mat-tab>
+    <mat-tab label="Referencias">
+      <div class="tab-content">
+        <app-referencias></app-referencias>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+

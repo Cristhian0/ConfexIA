@@ -1,0 +1,107 @@
+// Estilos del catálogo - Tema Azul Claro
+.catalogo-container {
+  padding: 20px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  min-height: 100vh;
+  color: #1565c0;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 30px;
+  animation: fadeIn 1s ease-in;
+
+  .title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(144, 202, 249, 0.3);
+    color: #0d47a1;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+    margin: 10px 0 0 0;
+    opacity: 0.9;
+    color: #1976d2;
+  }
+}
+
+.tabs-modern {
+  ::ng-deep .mat-mdc-tab-header {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(144, 202, 249, 0.3);
+  }
+
+  ::ng-deep .mat-mdc-tab {
+    color: #1565c0 !important;
+    font-weight: 500;
+  }
+
+  ::ng-deep .mat-mdc-tab.mdc-tab--active {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+  }
+
+  ::ng-deep .mdc-tab-indicator__content {
+    background-color: #2196f3 !important;
+  }
+}
+
+.tab-content {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 8px 25px rgba(144, 202, 249, 0.2);
+  animation: slideUp 0.5s ease-out;
+  color: #0d47a1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+mat-tab-body {
+  padding: 20px 0;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    color: #1565c0;
+  }
+}
+
+table {
+  width: 100%;
+}
+
+mat-card {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(144, 202, 249, 0.2);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+mat-spinner {
+  margin: 20px auto;
+}
+

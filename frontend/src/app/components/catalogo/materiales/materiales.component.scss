@@ -1,0 +1,147 @@
+.materiales-container {
+  padding: 24px;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 64px);
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    margin: 0;
+    color: #1976d2;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 28px;
+    }
+  }
+
+  button {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 20px;
+    }
+  }
+}
+
+mat-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  mat-card-content {
+    text-align: center;
+    padding: 40px;
+
+    mat-spinner {
+      margin: 0 auto;
+    }
+  }
+}
+
+table {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+
+  ::ng-deep {
+    .mat-mdc-table {
+      background: transparent;
+    }
+
+    .mat-mdc-header-row {
+      background: #f5f5f5;
+    }
+
+    .mat-mdc-row:hover {
+      background: #f8f9fa;
+    }
+
+    .mat-mdc-cell,
+    .mat-mdc-header-cell {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .mat-mdc-header-cell {
+      font-weight: 600;
+      color: #424242;
+    }
+  }
+
+  mat-chip {
+    font-size: 12px;
+    min-height: 24px;
+  }
+
+  button {
+    border-radius: 6px;
+    margin: 0 2px;
+
+    &.mat-primary {
+      background: #1976d2;
+    }
+
+    &.mat-warn {
+      background: #f44336;
+    }
+  }
+}
+
+mat-paginator {
+  margin-top: 16px;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .materiales-container {
+    padding: 16px;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+
+    h2 {
+      justify-content: center;
+    }
+  }
+
+  table {
+    ::ng-deep {
+      .mat-mdc-cell,
+      .mat-mdc-header-cell {
+        padding: 8px;
+        font-size: 14px;
+      }
+    }
+
+    button {
+      min-width: 36px;
+      width: 36px;
+      height: 36px;
+    }
+  }
+}
+

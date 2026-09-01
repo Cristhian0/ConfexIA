@@ -1,0 +1,412 @@
+<div class="colillas-container">
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>Gestión de Colillas de Confección</mat-card-title>
+      <mat-card-subtitle>Crear, visualizar y descargar colillas de confeccionistas</mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <!-- FILTROS -->
+  <mat-card class="filtros-card">
+    <mat-card-content>
+      <form [formGroup]="formFiltros" class="filtros-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Taller</mat-label>
+          <mat-select formControlName="taller_id">
+            <mat-option value="">Todos los talleres</mat-option>
+            <mat-option *ngFor="let taller of talleres" [value]="taller.id">
+              {{ taller.nombre }} ({{ taller.codigo }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Lote</mat-label>
+          <mat-select formControlName="lote_id">
+            <mat-option value="">Todos los lotes</mat-option>
+            <mat-option *ngFor="let lote of lotes" [value]="lote.id">
+              Lote {{ lote.numero_lote }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="estado">
+            <mat-option value="">Todos los estados</mat-option>
+            <mat-option *ngFor="let estado of [EstadoColilla.PENDIENTE, EstadoColilla.EN_PROCESO, EstadoColilla.COMPLETADA]">
+              {{ estadoLabels[estado] }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="aplicarFiltros()">
+          <mat-icon>search</mat-icon> Filtrar
+        </button>
+        <button mat-raised-button (click)="limpiarFiltros()">
+          <mat-icon>clear</mat-icon> Limpiar
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- TABS PRINCIPALES -->
+  <mat-tab-group (selectedTabChange)="onTabChange($event)" class="main-tabs modern-tabs">
+    
+    <!-- TAB 1: CREAR COLILLA -->
+    <mat-tab label="Crear Colilla" [disabled]="loading">
+      <mat-card class="create-card">
+        <mat-card-header>
+          <mat-card-title>Nueva Colilla</mat-card-title>
+          <mat-card-subtitle>Crear una nueva colilla de confección</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="formNuevaColilla" (ngSubmit)="crearColilla()">
+            
+            <!-- Sección 1: Datos Básicos -->
+            <h3>Información General</h3>
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Lote *</mat-label>
+                <mat-select formControlName="lote_id" required (selectionChange)="onLoteSeleccionado($event.value)">
+                  <mat-option value="">Selecciona un lote</mat-option>
+                  <mat-option *ngFor="let lote of lotes" [value]="lote.id">
+                    Lote {{ lote.numero_lote }} - {{ lote.referencia_nombre || 'N/A' }}
+                    ({{ lote.cantidad_total_programada || 0 }} prendas - {{ lote.estado }})
+                  </mat-option>
+                </mat-select>
+                <mat-hint>{{ lotes.length }} lotes disponibles</mat-hint>
+                <mat-error>El lote es requerido</mat-error>
+                <button mat-icon-button matSuffix (click)="refrescarLotes()" [disabled]="loading" matTooltip="Refrescar lotes">
+                  <mat-icon>refresh</mat-icon>
+                </button>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Taller *</mat-label>
+                <mat-select formControlName="taller_id" required>
+                  <mat-option value="">Selecciona un taller</mat-option>
+                  <mat-option *ngFor="let taller of talleres" [value]="taller.id">
+                    {{ taller.nombre }} ({{ taller.codigo }})
+                  </mat-option>
+                </mat-select>
+                <mat-error>El taller es requerido</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Sección 2: Datos del Confeccionista -->
+            <h3>Confeccionista</h3>
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nombre del Confeccionista *</mat-label>
+                <input matInput formControlName="confeccionista_nombre" required>
+                <mat-error>El nombre es requerido</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Cédula</mat-label>
+                <input matInput formControlName="confeccionista_cedula">
+              </mat-form-field>
+            </div>
+
+            <!-- Sección 3: Tipo de Trabajo -->
+            <h3>Tipo de Trabajo</h3>
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Tipo de Trabajo *</mat-label>
+                <mat-select formControlName="tipo_trabajo" required>
+                  <mat-option value="">Selecciona tipo</mat-option>
+                  <mat-option [value]="TipoTrabajo.ENSAMBLE">{{ tipoTrabajoLabels[TipoTrabajo.ENSAMBLE] }}</mat-option>
+                  <mat-option [value]="TipoTrabajo.COSTURA">{{ tipoTrabajoLabels[TipoTrabajo.COSTURA] }}</mat-option>
+                  <mat-option [value]="TipoTrabajo.FILETEADO">{{ tipoTrabajoLabels[TipoTrabajo.FILETEADO] }}</mat-option>
+                  <mat-option [value]="TipoTrabajo.TERMINACION">{{ tipoTrabajoLabels[TipoTrabajo.TERMINACION] }}</mat-option>
+                  <mat-option [value]="TipoTrabajo.OTRO">{{ tipoTrabajoLabels[TipoTrabajo.OTRO] }}</mat-option>
+                </mat-select>
+                <mat-error>El tipo de trabajo es requerido</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Cantidad de Prendas *</mat-label>
+                <input matInput type="number" formControlName="cantidad_prendas" min="1" required>
+                <mat-error>Cantidad requerida (mínimo 1)</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Descripción del Trabajo</mat-label>
+                <textarea matInput formControlName="descripcion_trabajo" rows="3"></textarea>
+              </mat-form-field>
+            </div>
+
+            <!-- Sección 4: Detalles del Producto -->
+            <h3>Detalles del Producto</h3>
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Referencia</mat-label>
+                <input matInput formControlName="referencia">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Color</mat-label>
+                <input matInput formControlName="color">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Talla</mat-label>
+                <input matInput type="number" formControlName="talla_id" min="0">
+              </mat-form-field>
+            </div>
+
+            <!-- Sección 5: Entrega y Observaciones -->
+            <h3>Entrega y Observaciones</h3>
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Fecha Límite de Entrega</mat-label>
+                <input matInput type="date" formControlName="fecha_limite_entrega">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Observaciones</mat-label>
+                <textarea matInput formControlName="observaciones" rows="3"></textarea>
+              </mat-form-field>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="button-group">
+              <button mat-raised-button color="primary" type="submit" [disabled]="formNuevaColilla.invalid || loading">
+                <mat-icon *ngIf="!loading">add</mat-icon>
+                <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
+                {{ loading ? 'Creando...' : 'Crear Colilla' }}
+              </button>
+              <button mat-raised-button type="button" (click)="formNuevaColilla.reset()">
+                <mat-icon>refresh</mat-icon> Limpiar Formulario
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+
+    <!-- TAB 2: COLILLAS POR CONFECCIONISTA -->
+    <mat-tab label="Por Confeccionista">
+      <mat-card class="list-card">
+        <mat-card-header>
+          <mat-card-title>Colillas Agrupadas por Confeccionista</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div *ngIf="loading" class="loading-spinne">
+            <mat-spinner></mat-spinner>
+            <p>Cargando colillas...</p>
+          </div>
+
+          <div *ngIf="!loading && objectKeys(colillasPorConfeccionista).length === 0" class="no-data">
+            <mat-icon>inbox</mat-icon>
+            <p>No hay colillas para mostrar. Selecciona un taller en los filtros.</p>
+          </div>
+
+          <div *ngIf="!loading && objectKeys(colillasPorConfeccionista).length > 0" class="confeccionistas-list">
+            <mat-expansion-panel *ngFor="let conf of colillasPorConfeccionista | keyvalue" class="confeccionista-panel">
+              <mat-expansion-panel-header>
+                <mat-panel-title class="panel-title">
+                  {{ conf.value.confeccionista }}
+                  <div class="chip-row">
+                    <span class="chip chip-primary">{{ conf.value.total_colillas }} colillas</span>
+                    <span class="chip chip-accent">{{ conf.value.total_prendas }} prendas</span>
+                    <span class="chip" [ngClass]="conf.value.total_completadas === conf.value.total_prendas ? 'chip-accent' : 'chip-warn'">
+                      {{ conf.value.total_completadas }}/{{ conf.value.total_prendas }} completadas
+                    </span>
+                  </div>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <mat-list>
+                <mat-list-item *ngFor="let col of conf.value.colillas" class="colilla-item">
+                  <mat-icon matListItemIcon>
+                    <span [ngSwitch]="col.estado">
+                      <ng-container *ngSwitchCase="'pendiente'">schedule</ng-container>
+                      <ng-container *ngSwitchCase="'en_proceso'">build</ng-container>
+                      <ng-container *ngSwitchCase="'completada'">check_circle</ng-container>
+                      <ng-container *ngSwitchDefault>cancel</ng-container>
+                    </span>
+                  </mat-icon>
+
+                  <div matListItemTitle>
+                    {{ col.numero_colilla }} - {{ col.tipo_trabajo }}
+                  </div>
+
+                  <div matListItemLine>
+                    {{ col.cantidad_completada }}/{{ col.cantidad_prendas }} prendas - Estado: <strong>{{ col.estado }}</strong>
+                  </div>
+
+                  <button mat-icon-button matListItemMeta (click)="visualizarPdfColilla(col.id)" matTooltip="Ver PDF">
+                    <mat-icon>picture_as_pdf</mat-icon>
+                  </button>
+                  <button mat-icon-button matListItemMeta (click)="descargarPdfColilla(col.id, col.numero_colilla)" matTooltip="Descargar PDF">
+                    <mat-icon>download</mat-icon>
+                  </button>
+                </mat-list-item>
+              </mat-list>
+            </mat-expansion-panel>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+
+    <!-- TAB 3: LISTADO DE COLILLAS -->
+    <mat-tab label="Listado Completo">
+      <mat-card class="list-card">
+        <mat-card-header>
+          <mat-card-title>Todas las Colillas</mat-card-title>
+          <div class="header-actions">
+            <button mat-raised-button color="accent" 
+                    (click)="descargarPdfLote(formFiltros.get('lote_id')?.value || 0)"
+                    [disabled]="!formFiltros.get('lote_id')?.value">
+              <mat-icon>picture_as_pdf</mat-icon> Descargar PDF
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div *ngIf="loading" class="loading-spinner">
+            <mat-spinner></mat-spinner>
+            <p>Cargando colillas...</p>
+          </div>
+
+          <div *ngIf="!loading && colillas.length === 0" class="no-data">
+            <mat-icon>inbox</mat-icon>
+            <p>No hay colillas para mostrar.</p>
+          </div>
+
+          <div *ngIf="!loading && colillas.length > 0" class="table-container">
+            <table mat-table [dataSource]="colillas" class="colillas-table">
+              
+              <!-- Número de Colilla -->
+              <ng-container matColumnDef="numero_colilla">
+                <th mat-header-cell *matHeaderCellDef>Colilla Nº</th>
+                <td mat-cell *matCellDef="let col">
+                  <strong>{{ col.numero_colilla }}</strong>
+                </td>
+              </ng-container>
+
+              <!-- Confeccionista -->
+              <ng-container matColumnDef="confeccionista_nombre">
+                <th mat-header-cell *matHeaderCellDef>Confeccionista</th>
+                <td mat-cell *matCellDef="let col">{{ col.confeccionista_nombre }}</td>
+              </ng-container>
+
+              <!-- Tipo de Trabajo -->
+              <ng-container matColumnDef="tipo_trabajo">
+                <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                <td mat-cell *matCellDef="let col">{{ tipoTrabajoLabels[col.tipo_trabajo] }}</td>
+              </ng-container>
+
+              <!-- Cantidad de Prendas -->
+              <ng-container matColumnDef="cantidad_prendas">
+                <th mat-header-cell *matHeaderCellDef>Prendas</th>
+                <td mat-cell *matCellDef="let col">{{ col.cantidad_prendas }}</td>
+              </ng-container>
+
+              <!-- Cantidad Completada -->
+              <ng-container matColumnDef="cantidad_completada">
+                <th mat-header-cell *matHeaderCellDef>Completadas</th>
+                <td mat-cell *matCellDef="let col">
+                  {{ col.cantidad_completada }}/{{ col.cantidad_prendas }}
+                  <mat-progress-bar mode="determinate" [value]="(col.cantidad_completada / col.cantidad_prendas) * 100"></mat-progress-bar>
+                </td>
+              </ng-container>
+
+              <!-- Estado -->
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let col">
+                  <mat-chip [color]="col.estado === 'completada' ? 'accent' : col.estado === 'en_proceso' ? 'warn' : ''" 
+                            selected>
+                    {{ estadoLabels[col.estado] }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- Fecha Límite -->
+              <ng-container matColumnDef="fecha_limite_entrega">
+                <th mat-header-cell *matHeaderCellDef>Fecha Límite</th>
+                <td mat-cell *matCellDef="let col">
+                  {{ col.fecha_limite_entrega ? (col.fecha_limite_entrega | date:'dd/MM/yyyy') : '—' }}
+                </td>
+              </ng-container>
+
+              <!-- Acciones -->
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let col" class="actions-cell">
+                  <button mat-icon-button (click)="visualizarPdfColilla(col.id)" matTooltip="Ver PDF">
+                    <mat-icon color="primary">picture_as_pdf</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="descargarPdfColilla(col.id, col.numero_colilla)" matTooltip="Descargar">
+                    <mat-icon>download</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="abrirDialogoActualizarEstado(col)" matTooltip="Cambiar estado">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="eliminarColilla(col.id)" matTooltip="Eliminar">
+                    <mat-icon color="warn">delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+
+    <!-- TAB 4: IMPORTAR PDF -->
+    <mat-tab label="Importar PDF" [disabled]="loading">
+      <mat-card class="import-card">
+        <mat-card-header>
+          <mat-card-title>Importar Colillas desde PDF</mat-card-title>
+          <mat-card-subtitle>Carga un archivo PDF con colillas para procesarlas</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="formCargaPDF">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Seleccionar Taller *</mat-label>
+              <mat-select>
+                <mat-option *ngFor="let taller of talleres" [value]="taller.id">
+                  {{ taller.nombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div class="file-upload-area">
+              <mat-icon class="upload-icon">cloud_upload</mat-icon>
+              <p class="upload-text">Arrastra un archivo PDF aquí o haz clic para seleccionar</p>
+              <input type="file" 
+                     #fileInput 
+                     hidden 
+                     accept=".pdf" 
+                     (change)="onArchivoSeleccionado($event)">
+              <button mat-raised-button (click)="fileInput.click()" type="button">
+                <mat-icon>attach_file</mat-icon> Seleccionar Archivo
+              </button>
+            </div>
+
+            <p class="info-text" *ngIf="formCargaPDF.get('archivo')?.value">
+              Archivo seleccionado: <strong>{{ formCargaPDF.get('archivo')?.value }}</strong>
+            </p>
+
+            <button mat-raised-button color="primary" (click)="cargarPDF()" 
+                    [disabled]="!formCargaPDF.get('archivo')?.value || loading">
+              <mat-icon *ngIf="!loading">upload</mat-icon>
+              <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
+              {{ loading ? 'Procesando...' : 'Procesar y Crear Colillas' }}
+            </button>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

@@ -1,0 +1,28 @@
+.demo-page { padding: 36px; }
+.demo-page { padding: 36px; }
+
+.home-solution { padding: 48px 24px; background: #f6f9fb; border-radius: 8px; }
+.solution-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 28px; align-items: flex-start; }
+.solution-left { flex: 1 1 55%; }
+.kicker { color: #00a99d; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.solution-left h2 { margin: 0 0 8px 0; font-size: 22px; }
+.lead { color: #586777; margin-bottom: 18px; }
+.issues-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.issue { background: white; padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(2,6,23,0.06); }
+
+.solution-right { flex: 1 1 45%; }
+.cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.big-card { height: 140px; border-radius: 12px; color: white; padding: 16px; display:flex; flex-direction:column; justify-content:flex-end; box-shadow: 0 10px 30px rgba(2,6,23,0.08); }
+.card-icon { font-size: 22px; background: rgba(255,255,255,0.08); width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:10px; margin-bottom:8px; }
+.card-title { font-weight:700; font-size:16px; }
+
+.card-gradient-blue { background: linear-gradient(180deg,#0f3a66,#183b80); }
+.card-gradient-teal { background: linear-gradient(180deg,#06b6a4,#06a58f); }
+.card-gradient-green { background: linear-gradient(180deg,#0bbf88,#06a58f); }
+.card-gradient-cyan { background: linear-gradient(180deg,#06b6a4,#00a7c4); }
+
+@media (max-width: 900px) {
+	.solution-inner { flex-direction: column; }
+	.issues-grid { grid-template-columns: repeat(2,1fr); }
+	.cards-grid { grid-template-columns: repeat(2,1fr); }
+}

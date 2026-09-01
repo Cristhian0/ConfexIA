@@ -1,0 +1,46 @@
+<div class="chart-wrap" role="img" aria-label="Gráfica demo IA textil">
+  <svg viewBox="0 0 420 260" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.9" />
+        <stop offset="100%" stop-color="#1e3a8a" stop-opacity="0.4" />
+      </linearGradient>
+      <linearGradient id="g2" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#34d399" stop-opacity="0.9" />
+        <stop offset="100%" stop-color="#065f46" stop-opacity="0.4" />
+      </linearGradient>
+    </defs>
+
+    <!-- grid -->
+    <g stroke="rgba(255,255,255,0.06)" stroke-width="1">
+      <line x1="40" x2="400" y1="40" y2="40"></line>
+      <line x1="40" x2="400" y1="90" y2="90"></line>
+      <line x1="40" x2="400" y1="140" y2="140"></line>
+      <line x1="40" x2="400" y1="190" y2="190"></line>
+    </g>
+
+    <!-- axes labels months -->
+    <g fill="#dbeafe" font-size="12" text-anchor="middle">
+      <text x="80" y="240">Ene</text>
+      <text x="140" y="240">Feb</text>
+      <text x="200" y="240">Mar</text>
+      <text x="260" y="240">Abr</text>
+      <text x="320" y="240">May</text>
+      <text x="380" y="240">Jun</text>
+    </g>
+
+    <!-- area predicción (suave) -->
+    <path d="M60,190 C100,170 140,180 180,150 C220,140 260,130 300,110 C340,95 380,80 400,70 L400,200 L60,200 Z" fill="url(#g2)" opacity="0.9"></path>
+
+    <!-- linea real -->
+    <polyline points="60,160 100,130 140,150 180,110 220,120 260,90 300,70 340,60 380,50" fill="none" stroke="#93c5fd" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+
+    <!-- small indicator boxes -->
+    <g transform="translate(16,8)">
+      <rect x="320" y="12" width="80" height="28" rx="6" fill="#083358" opacity="0.6"></rect>
+      <text x="336" y="32" fill="#dbeafe" font-size="12">IA: Predicción</text>
+      <rect x="320" y="44" width="80" height="28" rx="6" fill="#042f2a" opacity="0.5"></rect>
+      <text x="336" y="64" fill="#dbeafe" font-size="12">Datos: Real</text>
+    </g>
+  </svg>
+</div>

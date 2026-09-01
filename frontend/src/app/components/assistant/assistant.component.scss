@@ -1,0 +1,6 @@
+.assistant-card{ max-width:360px; border-radius:10px; background: linear-gradient(180deg,#ffffff,#fbfdff); }
+.assistant-avatar{ background: linear-gradient(90deg,#6b46c1,#3b82f6); color:white; display:flex; align-items:center; justify-content:center; font-weight:700 }
+.desc{ color:#374151; margin-bottom:10px }
+.examples{ display:flex; flex-direction:column; gap:8px }
+.example{ cursor:pointer; padding:8px; border-radius:8px; background:rgba(59,130,246,0.06); color:#0f172a }
+.example:hover{ background:rgba(59,130,246,0.12) }

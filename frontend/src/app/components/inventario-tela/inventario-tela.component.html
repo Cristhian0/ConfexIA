@@ -1,0 +1,336 @@
+<div class="bodega-container">
+  <h1>Bodega - Inventario de Rollos</h1>
+
+  <div *ngIf="loading" class="loading">Cargando stock...</div>
+
+  <mat-tab-group class="modern-tabs">
+    <mat-tab label="Registrar Ingreso de Tela">
+      <div class="tab-content">
+        <div class="form-card">
+          <div class="section-kicker">Ingreso</div>
+          <h2>🧵 Registrar Ingreso de Tela</h2>
+
+        <form [formGroup]="ingresoForm" (ngSubmit)="agregarIngreso()">
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Material</mat-label>
+              <mat-select formControlName="material_id">
+                <mat-option value="">Seleccionar...</mat-option>
+                <mat-option *ngFor="let m of materiales" [value]="m.id">{{ m.nombre }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Color</mat-label>
+              <mat-select formControlName="color_id">
+                <mat-option value="">Seleccionar...</mat-option>
+                <mat-option *ngFor="let c of colores" [value]="c.id">{{ c.nombre }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Lote Proveedor</mat-label>
+              <input matInput formControlName="lote_proveedor" placeholder="Ej: LOTE-PROV-001">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Metros</mat-label>
+              <input matInput type="number" formControlName="cantidad" min="0" step="0.01">
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción (opcional)</mat-label>
+            <input matInput formControlName="descripcion">
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" type="submit" [disabled]="ingresoForm.invalid">Registrar Ingreso</button>
+        </form>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Salida por Orden de Corte">
+      <div class="tab-content">
+        <h2>📤 Salida por Orden de Corte</h2>
+        <p class="tab-description">Registra el consumo de tela para una orden de corte específica. La cantidad se descontará del stock actual disponible.</p>
+
+        <div class="salida-container">
+          <!-- Información del stock disponible -->
+          <div class="stock-info-card" *ngIf="getStockDisponible(salidaForm.value.material_id, salidaForm.value.color_id)">
+            <h3>📊 Stock Disponible</h3>
+            <div class="stock-details">
+              <div class="stock-item">
+                <span class="label">Material:</span>
+                <span class="value">{{ getMaterialNombre(salidaForm.value.material_id) }}</span>
+              </div>
+              <div class="stock-item">
+                <span class="label">Color:</span>
+                <span class="value">{{ getColorNombre(salidaForm.value.color_id) }}</span>
+              </div>
+              <div class="stock-item">
+                <span class="label">Cantidad Actual:</span>
+                <span class="value quantity-available">{{ getStockDisponible(salidaForm.value.material_id, salidaForm.value.color_id) }} metros</span>
+              </div>
+              <div class="stock-item">
+                <span class="label">Reservado:</span>
+                <span class="value quantity-reserved">{{ getStockReservado(salidaForm.value.material_id, salidaForm.value.color_id) }} metros</span>
+              </div>
+              <div class="stock-item">
+                <span class="label">Disponible para uso:</span>
+                <span class="value quantity-available">{{ getStockDisponibleParaUso(salidaForm.value.material_id, salidaForm.value.color_id) }} metros</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulario de salida -->
+          <div class="salida-form-card">
+            <h3>📝 Registrar Salida</h3>
+            <form [formGroup]="salidaForm" (ngSubmit)="registrarSalida()">
+              <div class="form-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>ID Orden de Corte</mat-label>
+                  <input matInput type="number" formControlName="orden_corte_id" min="1" placeholder="Ej: 123">
+                  <mat-hint>Ingresa el número de la orden de corte</mat-hint>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Material</mat-label>
+                  <mat-select formControlName="material_id" (selectionChange)="onMaterialChange()">
+                    <mat-option value="">Seleccionar material...</mat-option>
+                    <mat-option *ngFor="let m of materiales" [value]="m.id">{{ m.nombre }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Color</mat-label>
+                  <mat-select formControlName="color_id" (selectionChange)="onColorChange()">
+                    <mat-option value="">Seleccionar color...</mat-option>
+                    <mat-option *ngFor="let c of colores" [value]="c.id">{{ c.nombre }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Cantidad a consumir (metros)</mat-label>
+                  <input matInput type="number" formControlName="cantidad" min="0" step="0.01" placeholder="0.00">
+                  <mat-hint>Cantidad que se descontará del stock disponible</mat-hint>
+                  <mat-error *ngIf="salidaForm.get('cantidad')?.hasError('required')">Cantidad requerida</mat-error>
+                  <mat-error *ngIf="salidaForm.get('cantidad')?.hasError('min')">Debe ser mayor a 0</mat-error>
+                  <mat-error *ngIf="checkStockInsuficiente()">Stock insuficiente para esta cantidad</mat-error>
+                </mat-form-field>
+              </div>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Descripción del consumo</mat-label>
+                <textarea matInput formControlName="descripcion" rows="3" placeholder="Ej: Corte de mangas, uso en producción, etc."></textarea>
+                <mat-hint>Describe para qué se está usando la tela</mat-hint>
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button mat-raised-button color="primary" type="submit" [disabled]="salidaForm.invalid || checkStockInsuficiente()">
+                  <mat-icon>send</mat-icon>
+                  Registrar Salida
+                </button>
+                <button mat-button type="button" (click)="limpiarSalidaForm()">
+                  <mat-icon>clear</mat-icon>
+                  Limpiar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Stock Actual">
+      <div class="tab-content">
+        <h2>Stock Actual</h2>
+
+        <div class="filter-row stock-filter" [formGroup]="filtroStockForm">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Tipo</mat-label>
+            <mat-select formControlName="tipo">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let m of materiales" [value]="m.nombre">{{ m.nombre }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Color</mat-label>
+            <mat-select formControlName="color">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let c of colores" [value]="c.nombre">{{ c.nombre }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Lote</mat-label>
+            <input matInput formControlName="lote" placeholder="Ej: LOTE-PROV-001">
+          </mat-form-field>
+
+          <button mat-flat-button color="primary" type="button" (click)="filtrarStock()">Buscar</button>
+          <button mat-button type="button" (click)="limpiarFiltroStock()">Limpiar</button>
+        </div>
+
+        <div class="seed-row">
+          <button class="btn-light" (click)="sembrarInventarioInicial()" [disabled]="seeding">
+            {{ seeding ? 'Registrando...' : 'Sembrar inventario inicial (20/30)' }}
+          </button>
+        </div>
+
+        <div class="stock-list">
+          <div *ngIf="!stock.length" class="empty">No hay stock registrado.</div>
+
+          <div class="stock-card" *ngFor="let s of stock">
+            <div class="stock-card-top">
+              <div class="label">Material</div>
+              <div class="value">{{ s.material_nombre || s.material_id }}</div>
+            </div>
+            <div class="stock-card-top">
+              <div class="label">Color</div>
+              <div class="value">{{ s.color_nombre || s.color_id }}</div>
+            </div>
+            <div class="stock-card-top">
+              <div class="label">Lote Proveedor</div>
+              <div class="value">{{ s.lote_proveedor || 'N/A' }}</div>
+            </div>
+            <div class="stock-qty">
+              <span class="qty">{{ s.cantidad_actual - s.cantidad_reservada }}</span>
+              <span class="unit">metros disponibles</span>
+            </div>
+            <div class="stock-reserved" *ngIf="s.cantidad_reservada > 0">
+              <span class="reserved">{{ s.cantidad_reservada }}</span>
+              <span class="unit">reservados</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Movimientos">
+      <div class="tab-content">
+        <h2>Movimientos</h2>
+
+        <div class="filter-row" [formGroup]="filtroMovimientosForm">
+          <div class="form-group">
+            <label>Filtrar por Orden de Corte (opcional)</label>
+            <input type="number" class="form-control" formControlName="orden_corte_id"/>
+          </div>
+          <button class="btn-primary" (click)="filtrarMovimientos()">Aplicar</button>
+          <button class="btn-light" (click)="cargarMovimientosInicial()">Limpiar</button>
+        </div>
+
+        <div class="history-list">
+          <div *ngIf="!movimientos.length" class="empty">Sin movimientos.</div>
+
+          <div class="movement-card" *ngFor="let mov of movimientos">
+            <div class="movement-row">
+              <span class="chip">{{ mov.tipo }}</span>
+              <span class="muted">Cantidad: </span>
+              <span>{{ mov.cantidad }}</span>
+            </div>
+            <div class="movement-row">
+              <span class="muted">Orden corte: </span>
+              <span>{{ mov.orden_corte_id || '-' }}</span>
+            </div>
+            <div class="movement-row">
+              <span class="muted">Fecha: </span>
+              <span>{{ formatDate(mov.fecha_movimiento) }}</span>
+            </div>
+            <div class="movement-row" *ngIf="mov.descripcion">
+              <span class="muted">Descripción: </span>
+              <span>{{ mov.descripcion }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Reservas de Tela">
+      <div class="tab-content">
+        <h2>Reservas de Tela</h2>
+
+        <div class="reservas-list">
+          <div *ngIf="!reservas.length" class="empty">No hay reservas activas.</div>
+
+          <div class="reserva-card" *ngFor="let r of reservas">
+            <div class="reserva-header">
+              <span class="reserva-material">{{ r.material_nombre }} - {{ r.color_nombre }}</span>
+              <span class="reserva-status" [ngClass]="r.estado">{{ r.estado }}</span>
+            </div>
+            <div class="reserva-details">
+              <div class="reserva-row">
+                <span class="muted">Metros reservados: </span>
+                <span>{{ r.metros }}</span>
+              </div>
+              <div class="reserva-row" *ngIf="r.orden_corte_numero">
+                <span class="muted">Orden de corte: </span>
+                <span>{{ r.orden_corte_numero }}</span>
+              </div>
+              <div class="reserva-row" *ngIf="r.observaciones">
+                <span class="muted">Observaciones: </span>
+                <span>{{ r.observaciones }}</span>
+              </div>
+              <div class="reserva-row">
+                <span class="muted">Fecha: </span>
+                <span>{{ formatDate(r.created_at) }}</span>
+              </div>
+            </div>
+            <div class="reserva-actions" *ngIf="r.estado === 'activa'">
+              <button mat-button color="warn" (click)="liberarReserva(r.id)">Liberar</button>
+              <button mat-raised-button color="primary" (click)="consumirReserva(r.id)">Consumir</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Reservar Tela para Producción">
+      <div class="tab-content">
+        <h2>Reservar Tela para Producción</h2>
+
+        <form [formGroup]="reservaForm" (ngSubmit)="crearReserva()">
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Material</mat-label>
+              <mat-select formControlName="material_id">
+                <mat-option value="">Seleccionar...</mat-option>
+                <mat-option *ngFor="let m of materiales" [value]="m.id">{{ m.nombre }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Color</mat-label>
+              <mat-select formControlName="color_id">
+                <mat-option value="">Seleccionar...</mat-option>
+                <mat-option *ngFor="let c of colores" [value]="c.id">{{ c.nombre }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Metros a reservar</mat-label>
+              <input matInput type="number" formControlName="metros" min="0" step="0.01">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Orden de Corte (opcional)</mat-label>
+              <input matInput type="number" formControlName="orden_corte_id" min="1">
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Observaciones (opcional)</mat-label>
+            <input matInput formControlName="observaciones">
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" type="submit" [disabled]="reservaForm.invalid">Reservar Tela</button>
+        </form>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
