@@ -3,7 +3,7 @@
 <mat-dialog-content>
 
   <form [formGroup]="form" class="lote-form">
-    <div class="form-row">
+    <div class="form-row top-row">
       <mat-form-field appearance="outline">
         <mat-label>Número de Lote</mat-label>
         <input matInput formControlName="numero_lote" required placeholder="Ej: LOTE-001">
@@ -20,7 +20,6 @@
         <mat-label>Confeccionista</mat-label>
         <input matInput formControlName="confeccionista_nombre" placeholder="Nombre del confeccionista">
       </mat-form-field>
-
     </div>
 
     <div class="form-row">
@@ -62,7 +61,7 @@
       </mat-form-field>
     </div>
 
-    <div class="form-row">
+    <div class="form-row compact-row">
       <mat-form-field>
         <mat-label>Fecha de Corte</mat-label>
         <input matInput [matDatepicker]="picker" formControlName="fecha_corte" required>

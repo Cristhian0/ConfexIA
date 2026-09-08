@@ -123,7 +123,8 @@ export class LotesComponent implements OnInit {
 
   abrirFormulario(lote?: Lote): void {
     const dialogRef = this.dialog.open(LoteFormComponent, {
-      width: '800px',
+      width: '1000px',
+      maxWidth: '95vw',
       data: lote
     });
 
