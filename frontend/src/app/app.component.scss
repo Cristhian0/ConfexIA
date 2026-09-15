@@ -1,7 +1,7 @@
-$sidebar-bg: #7c3aed;
+$sidebar-bg: #4f46e5;
 $sidebar-active: rgba(255, 255, 255, 0.18);
 $sidebar-text: #ffffff;
-$topbar-bg: #8b5cf6;
+$topbar-bg: #6d5efc;
 $topbar-text: #ffffff;
 $panel-bg: #ffffff;
 
@@ -47,7 +47,7 @@ $panel-bg: #ffffff;
 
 .app-sidenav {
   width: 260px;
-  background: linear-gradient(180deg, $sidebar-bg 0%, #002a5c 100%);
+  background: linear-gradient(180deg, $sidebar-bg 0%, #312e81 100%);
   color: $sidebar-text;
   border-right: none;
   overflow: hidden;
@@ -198,7 +198,7 @@ $panel-bg: #ffffff;
 }
 
 .page-breadcrumbs a {
-  color: #8b5cf6;
+  color: var(--textile-link, #6d5efc);
   text-decoration: none;
 }
 
@@ -221,7 +221,7 @@ button.mat-icon-button.action-button mat-icon[color="warn"] {
 }
 
 button.mat-icon-button.action-button mat-icon[color="primary"] {
-  color: #7c3aed;
+  color: #6d5efc;
 }
 
 .mat-mdc-card {
@@ -231,7 +231,7 @@ button.mat-icon-button.action-button mat-icon[color="primary"] {
 /* Landing hero for unauthenticated users */
 .landing-hero {
   padding: 48px 24px;
-  background: linear-gradient(180deg, #4c1d95 0%, #312e81 100%);
+  background: linear-gradient(180deg, var(--textile-hero-start) 0%, var(--textile-hero-end) 100%);
   color: #ffffff;
 }
 
@@ -263,7 +263,7 @@ button.mat-icon-button.action-button mat-icon[color="primary"] {
 }
 
 .landing-hero .accent {
-  color: #2dd4bf;
+  color: #c4b5fd;
 }
 
 .landing-hero .hero-sub {

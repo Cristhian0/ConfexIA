@@ -3,17 +3,20 @@
 @import '@fontsource/material-icons/index.css';
 
 :root {
-  --textile-bg: #ffffff;
+  --textile-bg: #f8f7ff;
   --textile-surface: #ffffff;
-  --textile-surface-soft: #f5f3ff;
-  --textile-primary: #8b5cf6;
-  --textile-primary-dark: #6d28d9;
-  --textile-accent: #c084fc;
-  --textile-accent-soft: #f3e8ff;
+  --textile-surface-soft: #f3f0ff;
+  --textile-primary: #6d5efc;
+  --textile-primary-dark: #4f46e5;
+  --textile-accent: #8b5cf6;
+  --textile-accent-soft: #eef2ff;
   --textile-warn: #dc2626;
   --textile-muted: #6b7280;
-  --textile-border: rgba(139,92,246,0.16);
+  --textile-border: rgba(109, 94, 252, 0.18);
   --textile-text: #1f2937;
+  --textile-link: #6d5efc;
+  --textile-hero-start: #4f46e5;
+  --textile-hero-end: #312e81;
 }
 
 * {
@@ -102,7 +105,17 @@ body::before {
 }
 
 .mat-mdc-table .mat-mdc-header-row, .mat-mdc-table .mat-mdc-row {
-  border-bottom: 1px solid rgba(49,95,111,0.08);
+  border-bottom: 1px solid rgba(109, 94, 252, 0.08);
+}
+
+.mat-mdc-form-field-focus-overlay {
+  background: rgba(109, 94, 252, 0.08);
+}
+
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--textile-primary) !important;
 }
 
 .full-width {

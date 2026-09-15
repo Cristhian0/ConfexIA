@@ -54,11 +54,11 @@
 }
 
 .modern-tabs ::ng-deep .mat-mdc-tab-header {
-  background: linear-gradient(135deg, #e0ecff 0%, #f8fbff 100%);
-  border: 1px solid rgba(37, 99, 235, 0.16);
+  background: linear-gradient(135deg, #eef2ff 0%, #f8f7ff 100%);
+  border: 1px solid rgba(109, 94, 252, 0.16);
   border-radius: 18px;
   padding: 4px;
-  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.10);
+  box-shadow: 0 10px 30px rgba(109, 94, 252, 0.10);
 }
 
 .modern-tabs ::ng-deep .mat-mdc-tab {
@@ -73,9 +73,9 @@
 }
 
 .modern-tabs ::ng-deep .mat-mdc-tab.mdc-tab--active {
-  background: linear-gradient(135deg, #003d82 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #8b5cf6 100%);
   color: #ffffff;
-  box-shadow: 0 8px 20px rgba(0, 61, 130, 0.24);
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.24);
 }
 
 .modern-tabs ::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
@@ -97,7 +97,7 @@
       font-size: 16px;
       font-weight: 600;
       color: #333;
-      border-bottom: 2px solid #4472c4;
+      border-bottom: 2px solid #6d5efc;
       padding-bottom: 10px;
 
       &:first-child {
@@ -207,7 +207,7 @@
   border-radius: 14px;
 
   th {
-    background: linear-gradient(135deg, #003d82 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #312e81 0%, #6d5efc 100%);
     font-weight: 700;
     color: #ffffff;
     border-bottom: none;

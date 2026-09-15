@@ -18,7 +18,7 @@
   h3 {
     color: #555;
     margin-bottom: 1rem;
-    border-bottom: 2px solid #007bff;
+    border-bottom: 2px solid #6d5efc;
     padding-bottom: 0.5rem;
   }
 
@@ -158,8 +158,8 @@
 
     &:focus {
       outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+      border-color: #6d5efc;
+      box-shadow: 0 0 0 3px rgba(109, 94, 252, 0.2);
     }
 
     &:disabled {
@@ -230,11 +230,11 @@
   }
 
   &.btn-primary {
-    background-color: #007bff;
+    background: linear-gradient(135deg, #6d5efc 0%, #8b5cf6 100%);
     color: white;
 
     &:hover:not(:disabled) {
-      background-color: #0056b3;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     }
   }
 
@@ -526,7 +526,7 @@
 .observaciones {
   background: #f8f9fa;
   padding: 1rem;
-  border-left: 4px solid #007bff;
+  border-left: 4px solid #6d5efc;
   border-radius: 4px;
   margin-top: 1rem;
 

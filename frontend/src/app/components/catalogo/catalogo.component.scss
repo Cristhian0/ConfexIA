@@ -1,9 +1,9 @@
-// Estilos del catálogo - Tema Azul Claro
+// Estilos del catálogo - Tema azul-lila
 .catalogo-container {
   padding: 20px;
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  background: linear-gradient(135deg, #f5f3ff 0%, #e0e7ff 100%);
   min-height: 100vh;
-  color: #1565c0;
+  color: #4f46e5;
 }
 
 .header-section {
@@ -15,15 +15,15 @@
     font-size: 2.5rem;
     font-weight: bold;
     margin: 0;
-    text-shadow: 2px 2px 4px rgba(144, 202, 249, 0.3);
-    color: #0d47a1;
+    text-shadow: 2px 2px 4px rgba(109, 94, 252, 0.15);
+    color: #312e81;
   }
 
   .subtitle {
     font-size: 1.2rem;
     margin: 10px 0 0 0;
     opacity: 0.9;
-    color: #1976d2;
+    color: #5b4ef6;
   }
 }
 
@@ -36,28 +36,28 @@
   }
 
   ::ng-deep .mat-mdc-tab {
-    color: #1565c0 !important;
+    color: #4f46e5 !important;
     font-weight: 500;
   }
 
   ::ng-deep .mat-mdc-tab.mdc-tab--active {
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.45);
     border-radius: 8px;
   }
 
   ::ng-deep .mdc-tab-indicator__content {
-    background-color: #2196f3 !important;
+    background-color: #7c3aed !important;
   }
 }
 
 .tab-content {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.96);
   border-radius: 15px;
   padding: 20px;
   margin-top: 20px;
-  box-shadow: 0 8px 25px rgba(144, 202, 249, 0.2);
+  box-shadow: 0 8px 25px rgba(109, 94, 252, 0.14);
   animation: slideUp 0.5s ease-out;
-  color: #0d47a1;
+  color: #312e81;
 }
 
 @keyframes fadeIn {
@@ -82,7 +82,7 @@ mat-tab-body {
 
   h2 {
     margin: 0;
-    color: #1565c0;
+    color: #4f46e5;
   }
 }
 
