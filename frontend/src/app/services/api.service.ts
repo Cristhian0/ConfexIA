@@ -31,5 +31,10 @@ export class ApiService {
   delete<T>(endpoint: string): Observable<T> {
     return this.http.delete<T>(`${this.apiUrl}${endpoint}`);
   }
+
+  // Obtener blobs (para descargas de archivos)
+  getBlob(endpoint: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}${endpoint}`, { responseType: 'blob' });
+  }
 }
 

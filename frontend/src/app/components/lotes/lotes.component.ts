@@ -22,6 +22,7 @@ import { OrdenCorteBasica } from '../../models/lote.model';
 })
 export class LotesComponent implements OnInit {
   lotes: Lote[] = [];
+  filteredLotes: Lote[] = [];
   referencias: Referencia[] = [];
   materiales: Material[] = [];
   colores: Color[] = [];
@@ -30,6 +31,13 @@ export class LotesComponent implements OnInit {
   ordenesCorte: OrdenCorteBasica[] = [];
   displayedColumns: string[] = ['mesa','fecha_corte','referencia','colores','material_total','tallas','fecha_entrega','fecha_estimada','despacha','confeccionista','remision','cantidad_total','acciones'];
   loading = false;
+  filtros: any = {
+    referenciaId: null,
+    materialId: null,
+    texto: '',
+    fechaDesde: null,
+    fechaHasta: null
+  };
 
   constructor(
     private loteService: LoteService,
@@ -105,6 +113,7 @@ export class LotesComponent implements OnInit {
     this.loteService.listar().subscribe({
       next: (data) => {
         this.lotes = data || [];
+        this.filteredLotes = this.lotes.slice();
         this.loading = false;
         this.cdr.detectChanges();
         // Si los catálogos aún no están cargados, intentar recargarlos
@@ -119,6 +128,67 @@ export class LotesComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  aplicarFiltros(): void {
+    const f = this.filtros;
+    const desde = f.fechaDesde ? new Date(f.fechaDesde) : null;
+    const hasta = f.fechaHasta ? new Date(f.fechaHasta) : null;
+
+    this.filteredLotes = this.lotes.filter(lote => {
+      // Filtrar por referencia: intentar por id, si no existe comparar por nombre/código
+      if (f.referenciaId) {
+        const refSel = this.referencias.find(r => r.id === f.referenciaId);
+        const nombreRefSel = refSel ? (refSel.nombre || refSel.codigo || '').toString().toLowerCase() : null;
+        const loteRefId = (lote as any).referencia_id;
+        const loteRefNombre = (lote as any).referencia_nombre ? (lote as any).referencia_nombre.toString().toLowerCase() : null;
+        if (loteRefId && loteRefId === f.referenciaId) {
+          // ok
+        } else if (nombreRefSel && loteRefNombre && loteRefNombre.includes(nombreRefSel)) {
+          // ok
+        } else {
+          return false;
+        }
+      }
+
+      // Filtrar por material: intentar por id, si no existe comparar por nombre/código
+      if (f.materialId) {
+        const matSel = this.materiales.find(m => m.id === f.materialId);
+        const nombreMatSel = matSel ? (matSel.nombre || matSel.codigo || '').toString().toLowerCase() : null;
+        const loteMatId = (lote as any).material_id;
+        const loteMatNombre = (lote as any).material_nombre ? (lote as any).material_nombre.toString().toLowerCase() : null;
+        if (loteMatId && loteMatId === f.materialId) {
+          // ok
+        } else if (nombreMatSel && loteMatNombre && loteMatNombre.includes(nombreMatSel)) {
+          // ok
+        } else {
+          return false;
+        }
+      }
+      // Filtrar por texto (mesa, referencia_nombre, material_nombre, remision)
+      const texto = (f.texto || '').toString().toLowerCase().trim();
+      if (texto) {
+        const hayTexto = [
+          lote.mesa, lote.referencia_nombre, lote.material_nombre,
+          (lote as any).remision_numero
+        ].filter(Boolean).map(x => x.toString().toLowerCase()).some(s => s.includes(texto));
+        if (!hayTexto) return false;
+      }
+      // Filtrar por fecha de corte
+      if (desde || hasta) {
+        const fecha = lote.fecha_corte ? new Date(lote.fecha_corte) : null;
+        if (desde && fecha && fecha < desde) return false;
+        if (hasta && fecha && fecha > hasta) return false;
+      }
+      return true;
+    });
+    this.cdr.detectChanges();
+  }
+
+  limpiarFiltros(): void {
+    this.filtros = { referenciaId: null, materialId: null, texto: '', fechaDesde: null, fechaHasta: null };
+    this.filteredLotes = this.lotes.slice();
+    this.cdr.detectChanges();
   }
 
   abrirFormulario(lote?: Lote): void {
@@ -224,6 +294,25 @@ export class LotesComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.cargarLotes();
+      }
+    });
+  }
+
+  exportarExcel(): void {
+    this.loteService.exportarExcel().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'lotes_export.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Error exportando Excel:', err);
+        this.snackBar.open('Error al exportar Excel', 'Cerrar', { duration: 3000 });
       }
     });
   }

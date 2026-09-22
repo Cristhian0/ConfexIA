@@ -37,5 +37,9 @@ export class LoteService {
   actualizarEstado(id: number, estado: EstadoLote): Observable<Lote> {
     return this.api.patch<Lote>(`/lotes-produccion/${id}/estado`, { estado: estado });
   }
+
+  exportarExcel(): Observable<Blob> {
+    return this.api.getBlob(`/lotes-produccion/export`);
+  }
 }
 

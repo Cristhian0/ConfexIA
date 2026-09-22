@@ -6,6 +6,10 @@
         <mat-icon>upload_file</mat-icon>
         Importar Excel
       </button>
+      <button mat-raised-button color="primary" (click)="exportarExcel()">
+        <mat-icon>download</mat-icon>
+        Exportar Excel
+      </button>
       <button mat-raised-button color="primary" (click)="abrirFormulario()">
         <mat-icon>add</mat-icon>
         Nuevo Lote
@@ -21,8 +25,49 @@
 
   <mat-card *ngIf="!loading">
     <mat-card-content>
+      <div class="filtros-row">
+        <mat-form-field appearance="outline" class="filtro-item">
+          <mat-label>Referencia</mat-label>
+          <mat-select [(ngModel)]="filtros.referenciaId" (selectionChange)="aplicarFiltros()">
+            <mat-option [value]="null">Todas</mat-option>
+            <mat-option *ngFor="let r of referencias" [value]="r.id">{{ r.nombre || r.codigo }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filtro-item">
+          <mat-label>Material</mat-label>
+          <mat-select [(ngModel)]="filtros.materialId" (selectionChange)="aplicarFiltros()">
+            <mat-option [value]="null">Todos</mat-option>
+            <mat-option *ngFor="let m of materiales" [value]="m.id">{{ m.nombre || m.codigo }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filtro-item">
+          <mat-label>Buscar</mat-label>
+          <input matInput placeholder="Mesa, referencia, material..." [(ngModel)]="filtros.texto" (ngModelChange)="aplicarFiltros()">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filtro-item">
+          <mat-label>Fecha desde</mat-label>
+          <input matInput [matDatepicker]="dpDesde" [(ngModel)]="filtros.fechaDesde" (dateChange)="aplicarFiltros()">
+          <mat-datepicker-toggle matSuffix [for]="dpDesde"></mat-datepicker-toggle>
+          <mat-datepicker #dpDesde></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filtro-item">
+          <mat-label>Fecha hasta</mat-label>
+          <input matInput [matDatepicker]="dpHasta" [(ngModel)]="filtros.fechaHasta" (dateChange)="aplicarFiltros()">
+          <mat-datepicker-toggle matSuffix [for]="dpHasta"></mat-datepicker-toggle>
+          <mat-datepicker #dpHasta></mat-datepicker>
+        </mat-form-field>
+
+        <div class="filtro-acciones">
+          <button mat-stroked-button (click)="limpiarFiltros()">Limpiar</button>
+        </div>
+      </div>
+
       <div class="table-responsive">
-        <table mat-table [dataSource]="lotes" class="mat-elevation-z2 lote-table">
+        <table mat-table [dataSource]="filteredLotes" class="mat-elevation-z2 lote-table">
 
         <ng-container matColumnDef="mesa">
           <th mat-header-cell *matHeaderCellDef>MESA</th>
@@ -70,7 +115,7 @@
         </ng-container>
 
         <ng-container matColumnDef="confeccionista">
-          <th mat-header-cell *matHeaderCellDef>CONFECCIONISTA</th>
+          <th mat-header-cell *matHeaderCellDef>TALLER</th>
           <td mat-cell *matCellDef="let lote">{{ getConfeccionistas(lote) }}</td>
         </ng-container>
 

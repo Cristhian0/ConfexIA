@@ -7,6 +7,9 @@ from app.models import Lote, LoteDetalle
 from app.models.lote import EstadoLote
 from app.schemas.lote import LoteCreate, LoteUpdate, LoteResponse, LoteDetalleResponse
 from app.core.business_rules import validar_lote_producto_unico
+import pandas as pd
+from io import BytesIO
+from fastapi.responses import StreamingResponse
 
 router = APIRouter()
 
@@ -389,6 +392,69 @@ def crear_lote(lote: LoteCreate, db: Session = Depends(get_db)):
         print(f"Error detallado al crear lote: {error_detail}")
         raise HTTPException(status_code=500, detail=f"Error al crear el lote: {str(e)}")
 
+@router.get("/export")
+def exportar_lotes_excel(db: Session = Depends(get_db)):
+    """Exporta todos los lotes (histórico) a un archivo Excel y lo devuelve como descarga"""
+    query = db.query(Lote).options(
+        joinedload(Lote.referencia),
+        joinedload(Lote.material),
+        joinedload(Lote.detalles)
+    ).order_by(Lote.created_at.desc())
+    lotes = query.all()
+
+    filas = []
+    for lote in lotes:
+        try:
+            agregar_nombres_a_lote(lote)
+            colores = ''
+            if lote.detalles:
+                colores_set = set()
+                for d in lote.detalles:
+                    if getattr(d, 'color_nombre', None):
+                        colores_set.add(d.color_nombre)
+                colores = ', '.join(sorted(colores_set))
+
+            tallas = ''
+            if lote.detalles:
+                partes = []
+                for d in lote.detalles:
+                    talla = getattr(d, 'talla_id', '')
+                    cantidad = getattr(d, 'cantidad', 0) or 0
+                    partes.append(f"{talla}:{cantidad}")
+                tallas = '; '.join(partes)
+
+            fila = {
+                'mesa': getattr(lote, 'mesa', None),
+                'fecha_corte': getattr(lote, 'fecha_corte', None),
+                'referencia': getattr(lote, 'referencia_nombre', None),
+                'colores': colores,
+                'material': getattr(lote, 'material_nombre', None),
+                'tallas': tallas,
+                'fecha_entrega': getattr(lote, 'fecha_entrega', None),
+                'fecha_estimada': getattr(lote, 'fecha_entrega_estimada', None),
+                'despacha': getattr(lote, 'despacha', None),
+                'confeccionista': getattr(lote, 'confeccionista_nombre', None),
+                'remision': getattr(lote, 'remision_numero', None),
+                'cantidad_total': getattr(lote, 'cantidad_total_programada', None) or (
+                    sum([getattr(d, 'cantidad', 0) or 0 for d in (lote.detalles or [])])
+                )
+            }
+            filas.append(fila)
+        except Exception:
+            # Si hay un lote con datos problemáticos, continuar con los demás
+            continue
+
+    df = pd.DataFrame(filas)
+    output = BytesIO()
+    # Escribir a Excel
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='lotes')
+    output.seek(0)
+
+    headers = {"Content-Disposition": "attachment; filename=lotes_export.xlsx"}
+    return StreamingResponse(output, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers=headers)
+
+
 @router.get("/{lote_id}", response_model=LoteResponse)
 def obtener_lote(lote_id: int, db: Session = Depends(get_db)):
     lote = db.query(Lote).options(
@@ -399,6 +465,69 @@ def obtener_lote(lote_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Lote no encontrado")
     agregar_nombres_a_lote(lote)
     return lote
+
+
+@router.get("/export")
+def exportar_lotes_excel(db: Session = Depends(get_db)):
+    """Exporta todos los lotes (histórico) a un archivo Excel y lo devuelve como descarga"""
+    query = db.query(Lote).options(
+        joinedload(Lote.referencia),
+        joinedload(Lote.material),
+        joinedload(Lote.detalles)
+    ).order_by(Lote.created_at.desc())
+    lotes = query.all()
+
+    filas = []
+    for lote in lotes:
+        try:
+            agregar_nombres_a_lote(lote)
+            colores = ''
+            if lote.detalles:
+                colores_set = set()
+                for d in lote.detalles:
+                    if getattr(d, 'color_nombre', None):
+                        colores_set.add(d.color_nombre)
+                colores = ', '.join(sorted(colores_set))
+
+            tallas = ''
+            if lote.detalles:
+                partes = []
+                for d in lote.detalles:
+                    talla = getattr(d, 'talla_id', '')
+                    cantidad = getattr(d, 'cantidad', 0) or 0
+                    partes.append(f"{talla}:{cantidad}")
+                tallas = '; '.join(partes)
+
+            fila = {
+                'mesa': getattr(lote, 'mesa', None),
+                'fecha_corte': getattr(lote, 'fecha_corte', None),
+                'referencia': getattr(lote, 'referencia_nombre', None),
+                'colores': colores,
+                'material': getattr(lote, 'material_nombre', None),
+                'tallas': tallas,
+                'fecha_entrega': getattr(lote, 'fecha_entrega', None),
+                'fecha_estimada': getattr(lote, 'fecha_entrega_estimada', None),
+                'despacha': getattr(lote, 'despacha', None),
+                'confeccionista': getattr(lote, 'confeccionista_nombre', None),
+                'remision': getattr(lote, 'remision_numero', None),
+                'cantidad_total': getattr(lote, 'cantidad_total_programada', None) or (
+                    sum([getattr(d, 'cantidad', 0) or 0 for d in (lote.detalles or [])])
+                )
+            }
+            filas.append(fila)
+        except Exception:
+            # Si hay un lote con datos problemáticos, continuar con los demás
+            continue
+
+    df = pd.DataFrame(filas)
+    output = BytesIO()
+    # Escribir a Excel
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='lotes')
+    output.seek(0)
+
+    headers = {"Content-Disposition": "attachment; filename=lotes_export.xlsx"}
+    return StreamingResponse(output, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers=headers)
 
 @router.put("/{lote_id}", response_model=LoteResponse)
 def actualizar_lote(lote_id: int, lote: LoteUpdate, db: Session = Depends(get_db)):

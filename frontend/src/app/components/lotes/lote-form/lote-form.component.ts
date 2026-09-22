@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoteService } from '../../../services/lote.service';
 import { CatalogoService } from '../../../services/catalogo.service';
 import { CorteService } from '../../../services/corte.service';
+import { TallerService } from '../../../services/taller.service';
 import { Lote, LoteCreate, LoteUpdate, LoteDetalleCreate, OrdenCorteBasica } from '../../../models/lote.model';
 import { Talla } from '../../../models/talla.model';
 import { Color } from '../../../models/color.model';
@@ -23,6 +24,7 @@ export class LoteFormComponent implements OnInit {
   colores: Color[] = [];
   materiales: Material[] = [];
   referencias: Referencia[] = [];
+  talleres: any[] = [];
   ordenesCorte: OrdenCorteBasica[] = [];
   isEdit = false;
 
@@ -33,6 +35,7 @@ export class LoteFormComponent implements OnInit {
     private loteService: LoteService,
     private catalogoService: CatalogoService,
     private corteService: CorteService,
+    private tallerService: TallerService,
     private snackBar: MatSnackBar
   ) {
     this.inicializarFormulario();
@@ -43,7 +46,7 @@ export class LoteFormComponent implements OnInit {
       numero_lote: ['', Validators.required],
       mesa: [''],
       remision_numero: [''],
-      confeccionista_nombre: [''],
+      confeccionista_nombre: [null],
       referencia_nombre: ['', Validators.required],
       material_nombre: ['', Validators.required],
       orden_corte_id: [null],  // Asociación opcional con orden de corte
@@ -63,14 +66,50 @@ export class LoteFormComponent implements OnInit {
     this.inicializarFormulario();
     this.cargarCatalogos();
     this.cargarOrdenesCorte();
+    this.cargarTalleres();
     if (this.data) {
       this.isEdit = true;
       this.cargarDatos();
     } else {
       this.agregarDetalle();
+      this.generarNumeroLote();
     }
     // Actualizar total después de cargar datos
     setTimeout(() => this.actualizarTotal(), 200);
+  }
+
+  cargarTalleres(): void {
+    this.tallerService.listar(true).subscribe({
+      next: (data) => {
+        this.talleres = data || [];
+      },
+      error: (err) => {
+        console.error('Error cargando talleres:', err);
+        this.talleres = [];
+      }
+    });
+  }
+
+  generarNumeroLote(): void {
+    // Usar el id máximo de lotes para generar un consecutivo simple
+    this.loteService.listar().subscribe({
+      next: (data) => {
+        const maxId = (data || []).reduce((m, l) => Math.max(m, l.id || 0), 0);
+        const next = maxId + 1;
+        const padded = String(next).padStart(3, '0');
+        const nuevo = `LOTE-${padded}`;
+        // Establecer valor pero deshabilitar edición adicional en UI
+        this.form.get('numero_lote')?.setValue(nuevo);
+        // Asegurar que el control esté habilitado para que su valor se incluya en form.value
+        this.form.get('numero_lote')?.enable({ emitEvent: false });
+      },
+      error: (err) => {
+        console.error('Error obteniendo lotes para generar número:', err);
+        const fallback = `LOTE-000`;
+        this.form.get('numero_lote')?.setValue(fallback);
+        this.form.get('numero_lote')?.enable({ emitEvent: false });
+      }
+    });
   }
 
   cargarDatos(): void {
@@ -350,6 +389,24 @@ export class LoteFormComponent implements OnInit {
           }
         }
       }
+
+      // Convertir confeccionista (taller) si viene como id
+      let confeccionistaValor = formValue.confeccionista_nombre;
+      if (confeccionistaValor) {
+        let tallerId: number | null = null;
+        if (typeof confeccionistaValor === 'number') {
+          tallerId = confeccionistaValor;
+        } else if (typeof confeccionistaValor === 'string' && !isNaN(Number(confeccionistaValor)) && confeccionistaValor.trim() !== '') {
+          tallerId = parseInt(confeccionistaValor, 10);
+        }
+        if (tallerId !== null) {
+          const t = this.talleres.find(x => x.id === tallerId);
+          if (t) {
+            confeccionistaValor = t.nombre;
+            console.log(`DEBUG - Taller convertido de ID ${tallerId} a nombre: ${confeccionistaValor}`);
+          }
+        }
+      }
       
       // Convertir a string y validar
       referenciaNombre = String(referenciaNombre || '').trim();
@@ -374,7 +431,7 @@ export class LoteFormComponent implements OnInit {
         numero_lote: formValue.numero_lote,
         mesa: formValue.mesa || undefined,
         remision_numero: formValue.remision_numero || undefined,
-        confeccionista_nombre: formValue.confeccionista_nombre || undefined,
+        confeccionista_nombre: confeccionistaValor || undefined,
         referencia_nombre: referenciaNombre,
         material_nombre: materialNombre,
         fecha_corte: formValue.fecha_corte ? new Date(formValue.fecha_corte).toISOString() : new Date().toISOString(),

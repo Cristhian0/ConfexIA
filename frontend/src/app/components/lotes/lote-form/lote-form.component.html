@@ -6,7 +6,8 @@
     <div class="form-row top-row">
       <mat-form-field appearance="outline">
         <mat-label>Número de Lote</mat-label>
-        <input matInput formControlName="numero_lote" required placeholder="Ej: LOTE-001">
+        <input matInput formControlName="numero_lote" required placeholder="Ej: LOTE-001" readonly>
+        <mat-hint>Asignado automáticamente</mat-hint>
         <mat-error *ngIf="form.get('numero_lote')?.hasError('required')">Requerido</mat-error>
       </mat-form-field>
 
@@ -17,8 +18,11 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="small-field">
-        <mat-label>Confeccionista</mat-label>
-        <input matInput formControlName="confeccionista_nombre" placeholder="Nombre del confeccionista">
+        <mat-label>Taller</mat-label>
+        <mat-select formControlName="confeccionista_nombre">
+          <mat-option *ngIf="talleres.length === 0" disabled>No hay talleres disponibles</mat-option>
+          <mat-option *ngFor="let t of talleres" [value]="t.id">{{ t.nombre }} ({{ t.codigo }})</mat-option>
+        </mat-select>
       </mat-form-field>
     </div>
 

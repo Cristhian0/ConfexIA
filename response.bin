@@ -1,0 +1,14 @@
+HTTP/1.1 422 Unprocessable Entity
+Date: Tue, 22 Sep 2026 03:00:07 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+cf-cache-status: DYNAMIC
+rndr-id: 3dd02fd0-0ef8-4960
+Server: cloudflare
+vary: Accept-Encoding
+x-render-origin-server: uvicorn
+CF-RAY: a3ee0eb8dc84db3f-BOG
+alt-svc: h3=":443"; ma=86400
+
+{"detail":[{"type":"int_parsing","loc":["path","lote_id"],"msg":"Input should be a valid integer, unable to parse string as an integer","input":"export","url":"https://errors.pydantic.dev/2.5/v/int_parsing"}]}
